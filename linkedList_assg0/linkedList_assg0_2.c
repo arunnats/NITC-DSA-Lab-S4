@@ -136,13 +136,15 @@ int main()
 
         case 's':
             display(head);
+            printf("\n");
             break;
 
         case 'r':
-            reverse(head);
+            head = reverse(head);
             break;
 
         case 'e':
+            return 0;
             break;
 
         default:

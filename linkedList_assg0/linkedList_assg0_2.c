@@ -93,10 +93,17 @@ void display(Node *head)
 
 Node *reverse(Node *head)
 {
-    Node *currentNode = head;
+    if (head == NULL || head->next == NULL)
+    {
+        return head;
+    }
 
-    reverse(head->next);
-    currentNode->next = head;
+    Node *rest = reverse(head->next);
+
+    head->next->next = head;
+    head->next = NULL;
+
+    return rest;
 }
 
 int main()

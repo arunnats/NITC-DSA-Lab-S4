@@ -9,6 +9,24 @@ struct node
 
 typedef struct node Node;
 
+struct stack
+{
+    int data[101];
+    int top;
+};
+
+typedef struct stack Stack;
+
+void push(Stack *S, int x)
+{   
+    S->data[S->top++] = x;    
+}
+
+int pop(Stack *S)
+{
+    return S->data[S->top--];
+}
+
 Node *createNode(int x)
 {
     Node *newNode = (Node *)malloc(sizeof(Node));
@@ -36,6 +54,7 @@ Node *listInsert(int x, Node *head)
     }
     return head;
 }
+
 
 Node *listDelete(int key, Node *head)
 {
@@ -71,5 +90,76 @@ void listDisplay(Node *head)
     {
         printf("%d ", currentNode->data);
         currentNode = currentNode->next;
+    }
+}
+
+
+int listPal(Node* head)
+{
+    Stack* S;
+    S.top = -1;
+    
+    Node* currentNode = head;
+    
+    while(currentNode != NULL)
+    {
+        push(S, currentNode->data);
+        currentNode = currentNode -> next;   
+    }
+    
+    while(currentNode != NULL)
+    {
+        int temp =pop(S);
+        
+        if(currentNode->data != temp)
+        {
+            return 0;
+        }
+        
+        currentNode = currentNode -> next;   
+    }
+    return 1;
+}
+
+
+Node* deleteAll(Node* head, int x)
+{
+    Node* nextNode = head->next;
+    Node* currentNode = head;    
+    Node* prevNode = NULL;    
+    
+    if(currentNode->data == key)
+    {
+        head = nextNode;
+        free(currentNode);   
+        
+        prevNode = currentNode;
+        currentNode = currentNode -> next;
+        nextNode = currentNode -> next -> next;  
+    }
+    
+    while(currentNode != NULL)
+    {
+        if(currentNode->data == key)
+        {
+            prevNode->next = nextNode;
+            free(currentNode);      
+        }
+        prevNode = currentNode;
+        currentNode = currentNode -> next;
+        nextNode = currentNode -> next -> next;   
+    }
+    
+    return head;
+}
+
+Node* rDuplicate(Node* head)
+{
+    Node* currentNode = head;
+    
+    while(currentNode != NULL)
+    {
+        currentNode -> next = deleteAll(currentNode->next,currentNode->data);
+        currentNode = currentNode -> next;   
     }
 }

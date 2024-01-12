@@ -89,6 +89,35 @@ Node *swap(Node *head, int key1, int key2)
     return head;
 }
 
+Node *findMinimum(Node *head)
+{
+    Node *currentNode = head;
+    Node *minNode = head;
+    while (currentNode != NULL)
+    {
+        if (minNode->data > currentNode->data)
+        {
+            minNode = currentNode;
+        }
+        currentNode = currentNode->next;
+    }
+    return minNode;
+}
+
+Node *selectionSort(Node *head)
+{
+    Node *currentNode = head;
+
+    while (currentNode != NULL)
+    {
+        Node *minNode = findMinimum(currentNode);
+        head = swap(head, currentNode->data, minNode->data);
+        currentNode = currentNode->next;
+    }
+
+    return head;
+}
+
 int main()
 {
     int n;
@@ -97,7 +126,7 @@ int main()
     printf("Enter number of elements in the linked list: ");
     scanf("%d", &n);
     head = linkedListInput(n);
-
+    head = selectionSort(head);
     printf("Sorted linked list: ");
     display(head);
 

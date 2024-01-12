@@ -165,10 +165,50 @@ Node* rDuplicate(Node* head)
 }
 
 
-void main()
+int main()
 {
-    Node* head = NULL;
-    
-    
+    Node *head = NULL;
 
+    char choice;
+    int x;
+
+    do
+    {
+        scanf(" %c", &choice);
+
+        switch (choice)
+        {
+        case 'a':
+            scanf(" %d", &x);
+            head = listInsert(x, head);
+            break;
+
+        case 'r':
+            scanf(" %d", &x);
+            head = listDelete(x, head);
+            break;
+
+        case 'd':
+            head = rDuplicate(head);
+            listDisplay(head);
+            break;
+        
+        case 'p':
+            if(listPal)
+                printf("Y\n");
+            else
+                printf("N\n");
+            break;
+        
+        case 's':
+            listDisplay(head);
+            break;
+
+        default:
+            break
+        }
+
+    } while (choice != 'e');
+
+    return 0;
 }

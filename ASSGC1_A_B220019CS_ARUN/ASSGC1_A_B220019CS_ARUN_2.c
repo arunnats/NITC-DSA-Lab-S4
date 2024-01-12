@@ -96,20 +96,20 @@ void listDisplay(Node *head)
 
 int listPal(Node* head)
 {
-    Stack* S;
+    Stack S;
     S.top = -1;
     
     Node* currentNode = head;
     
     while(currentNode != NULL)
     {
-        push(S, currentNode->data);
+        push(&S, currentNode->data);
         currentNode = currentNode -> next;   
     }
     
     while(currentNode != NULL)
     {
-        int temp =pop(S);
+        int temp = pop(&S);
         
         if(currentNode->data != temp)
         {
@@ -128,7 +128,7 @@ Node* deleteAll(Node* head, int x)
     Node* currentNode = head;    
     Node* prevNode = NULL;    
     
-    if(currentNode->data == key)
+    if(currentNode->data == x)
     {
         head = nextNode;
         free(currentNode);   
@@ -140,7 +140,7 @@ Node* deleteAll(Node* head, int x)
     
     while(currentNode != NULL)
     {
-        if(currentNode->data == key)
+        if(currentNode->data == x)
         {
             prevNode->next = nextNode;
             free(currentNode);      
@@ -162,4 +162,13 @@ Node* rDuplicate(Node* head)
         currentNode -> next = deleteAll(currentNode->next,currentNode->data);
         currentNode = currentNode -> next;   
     }
+}
+
+
+void main()
+{
+    Node* head = NULL;
+    
+    
+
 }

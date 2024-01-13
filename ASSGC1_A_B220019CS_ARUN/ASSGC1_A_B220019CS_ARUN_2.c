@@ -18,8 +18,8 @@ struct stack
 typedef struct stack Stack;
 
 void push(Stack *S, int x)
-{   
-    S->data[S->top++] = x;    
+{
+    S->data[S->top++] = x;
 }
 
 int pop(Stack *S)
@@ -54,7 +54,6 @@ Node *listInsert(int x, Node *head)
     }
     return head;
 }
-
 
 Node *listDelete(int key, Node *head)
 {
@@ -93,77 +92,76 @@ void listDisplay(Node *head)
     }
 }
 
-
-int listPal(Node* head)
+int listPal(Node *head)
 {
     Stack S;
     S.top = -1;
-    
-    Node* currentNode = head;
-    
-    while(currentNode != NULL)
+
+    Node *currentNode = head;
+
+    while (currentNode != NULL)
     {
         push(&S, currentNode->data);
-        currentNode = currentNode -> next;   
+        currentNode = currentNode->next;
     }
-    
-    while(currentNode != NULL)
+    currentNode = head;
+    while (currentNode != NULL)
     {
         int temp = pop(&S);
-        
-        if(currentNode->data != temp)
+
+        if (currentNode->data != temp)
         {
             return 0;
         }
-        
-        currentNode = currentNode -> next;   
+        currentNode = currentNode->next;
     }
     return 1;
 }
 
-
-Node* deleteAll(Node* head, int x)
+Node *deleteAll(Node *head, int x)
 {
-    Node* nextNode = head->next;
-    Node* currentNode = head;    
-    Node* prevNode = NULL;    
-    
-    if(currentNode->data == x)
+    Node *currentNode = head;
+    Node *prevNode = NULL;
+
+    while (currentNode != NULL)
     {
-        head = nextNode;
-        free(currentNode);   
-        
-        prevNode = currentNode;
-        currentNode = currentNode -> next;
-        nextNode = currentNode -> next -> next;  
-    }
-    
-    while(currentNode != NULL)
-    {
-        if(currentNode->data == x)
+        if (currentNode->data == x)
         {
-            prevNode->next = nextNode;
-            free(currentNode);      
+            if (prevNode == NULL)
+            {
+                head = currentNode->next;
+            }
+            else
+            {
+                prevNode->next = currentNode->next;
+            }
+
+            Node *temp = currentNode;
+            currentNode = currentNode->next;
+            free(temp);
         }
-        prevNode = currentNode;
-        currentNode = currentNode -> next;
-        nextNode = currentNode -> next -> next;   
+        else
+        {
+            prevNode = currentNode;
+            currentNode = currentNode->next;
+        }
     }
-    
+
     return head;
 }
 
-Node* rDuplicate(Node* head)
+Node *rDuplicate(Node *head)
 {
-    Node* currentNode = head;
-    
-    while(currentNode != NULL)
-    {
-        currentNode -> next = deleteAll(currentNode->next,currentNode->data);
-        currentNode = currentNode -> next;   
-    }
-}
+    Node *currentNode = head;
 
+    while (currentNode != NULL)
+    {
+        currentNode->next = deleteAll(currentNode->next, currentNode->data);
+        currentNode = currentNode->next;
+    }
+
+    return head;
+}
 
 int main()
 {
@@ -192,20 +190,20 @@ int main()
             head = rDuplicate(head);
             listDisplay(head);
             break;
-        
+
         case 'p':
-            if(listPal)
+            if (listPal(head))
                 printf("Y\n");
             else
                 printf("N\n");
             break;
-        
+
         case 's':
             listDisplay(head);
             break;
 
         default:
-            break
+            break;
         }
 
     } while (choice != 'e');

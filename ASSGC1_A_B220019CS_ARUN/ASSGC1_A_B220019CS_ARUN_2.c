@@ -55,30 +55,42 @@ Node *listInsert(int x, Node *head)
     return head;
 }
 
-Node *listDelete(int key, Node *head)
+Node *listDelete(int index, Node *head)
 {
-    if (head == NULL)
+    if (head == NULL || index <= 0)
     {
         return head;
     }
-    else
-    {
-        Node *currentNode = head;
-        Node *prevNode = NULL;
-        while (currentNode != NULL)
-        {
-            if (currentNode->data == key)
-            {
-                prevNode->next = currentNode->next;
-                free(currentNode);
-                break;
-            }
 
-            prevNode = currentNode;
-            currentNode = currentNode->next;
-        }
+    if (index == 1)
+    {
+        Node *temp = head;
+        head = head->next;
+        free(temp);
         return head;
     }
+
+    Node *currentNode = head;
+    Node *prevNode = NULL;
+    int count = 1;
+
+    while (currentNode != NULL && count < index)
+    {
+        prevNode = currentNode;
+        currentNode = currentNode->next;
+        count++;
+    }
+
+    if (currentNode == NULL)
+    {
+        printf("-1\n");
+        return head;
+    }
+
+    prevNode->next = currentNode->next;
+    printf("%d\n", currentNode->data);
+    free(currentNode);
+    return head;
 }
 
 void listDisplay(Node *head)
@@ -90,30 +102,39 @@ void listDisplay(Node *head)
         printf("%d ", currentNode->data);
         currentNode = currentNode->next;
     }
+    printf("\n");
+}
+
+Node *reverse(Node *head)
+{
+    if (head == NULL || head->next == NULL)
+    {
+        return head;
+    }
+
+    Node *rest = reverse(head->next);
+
+    head->next->next = head;
+    head->next = NULL;
+
+    return rest;
 }
 
 int listPal(Node *head)
 {
-    Stack S;
-    S.top = -1;
+    Node *reversed = reverse(head);
 
     Node *currentNode = head;
+    Node *currentReversedNode = head;
 
     while (currentNode != NULL)
     {
-        push(&S, currentNode->data);
-        currentNode = currentNode->next;
-    }
-    currentNode = head;
-    while (currentNode != NULL)
-    {
-        int temp = pop(&S);
-
-        if (currentNode->data != temp)
+        if (currentNode->data != currentReversedNode->data)
         {
             return 0;
         }
         currentNode = currentNode->next;
+        currentReversedNode = currentReversedNode->next;
     }
     return 1;
 }

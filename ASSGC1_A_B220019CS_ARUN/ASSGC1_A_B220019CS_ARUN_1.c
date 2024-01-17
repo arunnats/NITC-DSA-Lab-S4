@@ -34,26 +34,6 @@ int hasDuplicateParentheses(char *expression)
     struct Stack stack;
     initialize(&stack);
 
-    for (int i = 0; i < len; i++)
-    {
-        if (expression[i] == '(')
-        {
-            push(&stack, i);
-        }
-        else if (expression[i] == ')')
-        {
-            if (!isEmpty(&stack))
-            {
-                int openingIndex = pop(&stack);
-
-                if (i - openingIndex == 1)
-                {
-                    return 1;
-                }
-            }
-        }
-    }
-
     return 0;
 }
 

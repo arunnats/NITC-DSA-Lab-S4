@@ -129,9 +129,8 @@ Node *reverse(Node *head)
 int listPal(Node *head)
 {
     Node *reversed = reverse(head);
-
     Node *currentNode = head;
-    Node *currentReversedNode = head;
+    Node *currentReversedNode = reversed;
 
     while (currentNode != NULL)
     {

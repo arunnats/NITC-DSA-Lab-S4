@@ -228,10 +228,10 @@ int main()
             listDisplay(head);
             break;
 
-        case 'o':
-            Node *temp = reverse(head);
-            listDisplay(temp);
-            break;
+            /*case 'o':
+                Node *temp = reverse(head);
+                listDisplay(temp);
+                break;*/
 
         default:
             break;

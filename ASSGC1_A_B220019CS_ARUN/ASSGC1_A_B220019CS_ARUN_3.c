@@ -4,9 +4,9 @@
 
 struct Patient
 {
-    char name[100];
+    char name[1001];
     int priority;
-    char admitTime[100];
+    char admitTime[1001];
 };
 
 struct pQueue
@@ -98,4 +98,70 @@ void removeHeap(struct pQueue *priorityQueue, int index)
     swap(&priorityQueue->patients[index], &priorityQueue->patients[priorityQueue->size]);
     priorityQueue->size--;
     heapifyDown(priorityQueue, index);
+}
+
+void admitPatient(struct pQueue *priorityQueue, char *name, int priority, char *admitTime)
+{
+    struct Patient newPatient;
+    strcpy(newPatient.name, name);
+    newPatient.priority = priority;
+    strcpy(newPatient.admitTime, admitTime);
+
+    insertHeap(priorityQueue, newPatient);
+}
+
+int main()
+{
+    char option;
+    char name[1001];
+    int priority;
+    char admitTime[1001];
+
+    struct pQueue *priorityQueue = initializePriorityQueue(1001);
+
+    do
+    {
+        scanf(" %c", &option);
+
+        switch (option)
+        {
+        case 'a':
+            scanf(" %s %d %s", name, &priority, admitTime);
+            admitPatient(priorityQueue, name, priority, admitTime);
+            break;
+
+        case 't':
+            treatNextPatient(priorityQueue);
+            break;
+
+        case 'c':
+            checkNextPatient(priorityQueue);
+            break;
+
+        case 'd':
+            scanf(" %s %s", name, admitTime);
+            dischargePatient(priorityQueue, name, admitTime);
+            break;
+
+        case 'u':
+            scanf(" %s %s %d", name, admitTime, &priority);
+            updateConditionSeverity(priorityQueue, name, admitTime, priority);
+            break;
+
+        case 'p':
+            printAllPatients(priorityQueue);
+            break;
+
+        case 'e':
+            break;
+
+        default:
+            break;
+        }
+
+    } while (option != 'e');
+
+    freePriorityQueue(priorityQueue);
+
+    return 0;
 }

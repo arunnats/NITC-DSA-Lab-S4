@@ -112,12 +112,18 @@ Node *reverse(Node *head)
         return head;
     }
 
-    Node *rest = reverse(head->next);
+    Node *newHead = NULL;
+    Node *current = head;
 
-    head->next->next = head;
-    head->next = NULL;
+    while (current != NULL)
+    {
+        Node *newNode = createNode(current->data);
+        newNode->next = newHead;
+        newHead = newNode;
+        current = current->next;
+    }
 
-    return rest;
+    return newHead;
 }
 
 int listPal(Node *head)
@@ -221,6 +227,11 @@ int main()
 
         case 's':
             listDisplay(head);
+            break;
+
+        case 'o':
+            Node *temp = reverse(head);
+            listDisplay(temp);
             break;
 
         default:

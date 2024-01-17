@@ -16,7 +16,7 @@ struct pQueue
     int capacity;
 };
 
-struct pQueue *initializepQueue(int capacity)
+struct pQueue *initializePriorityQueue(int capacity)
 {
     struct pQueue *priorityQueue = (struct pQueue *)malloc(sizeof(struct pQueue));
     priorityQueue->patients = (struct Patient *)malloc(sizeof(struct Patient) * (capacity + 1));
@@ -110,6 +110,87 @@ void admitPatient(struct pQueue *priorityQueue, char *name, int priority, char *
     insertHeap(priorityQueue, newPatient);
 }
 
+void treatNextPatient(struct pQueue *priorityQueue)
+{
+    if (priorityQueue->size == 0)
+    {
+        printf("-1");
+        return;
+    }
+    else
+    {
+        printf("%s ", priorityQueue->patients[1].name);
+        printf("%d ", priorityQueue->patients[1].priority);
+        printf("%s\n", priorityQueue->patients[1].admitTime);
+        removeHeap(priorityQueue, 1);
+    }
+}
+
+void checkNextPatient(struct pQueue *priorityQueue)
+{
+    if (priorityQueue->size == 0)
+    {
+        printf("-1");
+        return;
+    }
+    else
+    {
+        printf("%s ", priorityQueue->patients[1].name);
+        printf("%d ", priorityQueue->patients[1].priority);
+        printf("%s\n", priorityQueue->patients[1].admitTime);
+    }
+}
+
+void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
+{
+    int i;
+    for (i = 1; i < priorityQueue->size; i++)
+    {
+        if (strcmp(priorityQueue->patients[i].name, name) == 0 && strcmp(priorityQueue->patients[i].admitTime, admitTime) == 0)
+        {
+            removeHeap(priorityQueue, i);
+            return;
+        }
+    }
+    printf("-1\n");
+    return;
+}
+
+void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *admitTime, int newPriority)
+{
+    int i;
+    for (i = 1; i < priorityQueue->size; i++)
+    {
+        if (strcmp(priorityQueue->patients[i].name, name) == 0 && strcmp(priorityQueue->patients[i].admitTime, admitTime) == 0)
+        {
+            removeHeap(priorityQueue, i);
+
+            struct Patient updatedPatient;
+            strcpy(updatedPatient.name, name);
+            updatedPatient.priority = newPriority;
+            strcpy(updatedPatient.admitTime, admitTime);
+
+            insertHeap(priorityQueue, updatedPatient);
+
+            return;
+        }
+    }
+    printf("-1\n");
+    return;
+}
+
+void printAllPatients(struct pQueue *priorityQueue)
+{
+    int i;
+    for (i = 1; i < priorityQueue->size; i++)
+    {
+        printf("%s ", priorityQueue->patients[i].name);
+        printf("%d ", priorityQueue->patients[i].priority);
+        printf("%s\n", priorityQueue->patients[i].admitTime);
+    }
+    return;
+}
+
 int main()
 {
     char option;
@@ -161,7 +242,8 @@ int main()
 
     } while (option != 'e');
 
-    freePriorityQueue(priorityQueue);
+    free(priorityQueue->patients);
+    free(priorityQueue);
 
-    return 0;
+    return 1;
 }

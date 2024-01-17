@@ -144,7 +144,7 @@ void checkNextPatient(struct pQueue *priorityQueue)
 void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
 {
     int i;
-    for (i = 1; i < priorityQueue->size; i++)
+    for (i = 1; i <= priorityQueue->size; i++)
     {
         if (strcmp(priorityQueue->patients[i].name, name) == 0 && strcmp(priorityQueue->patients[i].admitTime, admitTime) == 0)
         {
@@ -159,7 +159,7 @@ void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
 void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *admitTime, int newPriority)
 {
     int i;
-    for (i = 1; i < priorityQueue->size; i++)
+    for (i = 1; i <= priorityQueue->size; i++)
     {
         if (strcmp(priorityQueue->patients[i].name, name) == 0 && strcmp(priorityQueue->patients[i].admitTime, admitTime) == 0)
         {
@@ -182,7 +182,7 @@ void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *adm
 void printAllPatients(struct pQueue *priorityQueue)
 {
     int i;
-    for (i = 1; i < priorityQueue->size; i++)
+    for (i = 1; i <= priorityQueue->size; i++)
     {
         printf("%s ", priorityQueue->patients[i].name);
         printf("%d ", priorityQueue->patients[i].priority);

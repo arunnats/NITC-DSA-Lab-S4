@@ -43,6 +43,19 @@ int comparePatients(struct Patient *a, struct Patient *b)
         int timeComparison = strcmp(a->admitTime, b->admitTime);
         return timeComparison;
     }
+    /*else
+    {
+        int a_hour, a_minute, b_hour, b_minute;
+        sscanf(a->admitTime, "%d:%d", &a_hour, &a_minute);
+        sscanf(b->admitTime, "%d:%d", &b_hour, &b_minute);
+
+        if (a_hour > b_hour || (a_hour == b_hour && a_minute > b_minute))
+            return 1;
+        else if (a_hour < b_hour || (a_hour == b_hour && a_minute < b_minute))
+            return -1;
+        else
+            return 0;
+    }*/
 }
 
 void heapifyUp(struct pQueue *priorityQueue, int index)

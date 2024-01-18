@@ -1,52 +1,72 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-struct Stack
-{
-    int arr[1001];
-    int top;
-};
+#define MAX_SIZE 1000001
 
-void initialize(struct Stack *stack)
+char stack[MAX_SIZE];
+int top = -1;
+
+void push(char ch)
 {
-    stack->top = -1;
+    if (top == MAX_SIZE - 1)
+    {
+        printf("Stack Overflow\n");
+        exit(1);
+    }
+    stack[++top] = ch;
 }
 
-int isEmpty(struct Stack *stack)
+char pop()
 {
-    return stack->top == -1;
+    if (top == -1)
+    {
+        printf("Stack Underflow\n");
+        exit(1);
+    }
+    return stack[top--];
 }
 
-void push(struct Stack *stack, int element)
+int hasDuplicateParenthesis(char *expr)
 {
-    stack->arr[++stack->top] = element;
-}
-
-int pop(struct Stack *stack)
-{
-    return stack->arr[stack->top--];
-}
-
-int hasDuplicateParentheses(char *expression)
-{
-    int len = strlen(expression);
-
-    struct Stack stack;
-    initialize(&stack);
-
+    int i;
+    for (i = 0; expr[i]; i++)
+    {
+        char ch = expr[i];
+        if (ch == ')')
+        {
+            int count = 0;
+            while (top != -1 && stack[top] != '(')
+            {
+                pop();
+                count++;
+            }
+            pop();
+            if (count == 0 && (top != -1 && (stack[top] >= 'a' && stack[top] <= 'z')))
+            {
+                return 1;
+            }
+            else if (count == 0 || stack[top] == ')')
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            push(ch);
+        }
+    }
     return 0;
 }
 
 int main()
 {
     int n;
+    char expr[MAX_SIZE];
+
     scanf("%d", &n);
+    scanf("%s", expr);
 
-    char expression[1001];
-    scanf("%s", expression);
-
-    int result = hasDuplicateParentheses(expression);
-
+    int result = hasDuplicateParenthesis(expr);
     printf("%d\n", result);
 
     return 0;

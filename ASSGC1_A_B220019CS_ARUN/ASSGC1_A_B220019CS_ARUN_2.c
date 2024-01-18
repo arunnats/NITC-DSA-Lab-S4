@@ -239,5 +239,5 @@ int main()
 
     } while (choice != 'e');
 
-    return 0;
+    return 1;
 }

@@ -40,11 +40,6 @@ int comparePatients(struct Patient *a, struct Patient *b)
         return -1;
     else
     {
-        int timeComparison = strcmp(a->admitTime, b->admitTime);
-        return timeComparison;
-    }
-    /*else
-    {
         int a_hour, a_minute, b_hour, b_minute;
         sscanf(a->admitTime, "%d:%d", &a_hour, &a_minute);
         sscanf(b->admitTime, "%d:%d", &b_hour, &b_minute);
@@ -55,7 +50,7 @@ int comparePatients(struct Patient *a, struct Patient *b)
             return -1;
         else
             return 0;
-    }*/
+    }
 }
 
 void heapifyUp(struct pQueue *priorityQueue, int index)

@@ -1,60 +1,65 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MAX_SIZE 1000001
+#define MAX_SIZE 1000000
 
-char stack[MAX_SIZE];
-int top = -1;
-
-void push(char ch)
+typedef struct
 {
-    if (top == MAX_SIZE - 1)
+    char arr[MAX_SIZE];
+    int top;
+} Stack;
+
+void push(Stack *s, char ch)
+{
+    if (s->top == MAX_SIZE - 1)
     {
         printf("Stack Overflow\n");
         exit(1);
     }
-    stack[++top] = ch;
+    s->arr[++(s->top)] = ch;
 }
 
-char pop()
+char pop(Stack *s)
 {
-    if (top == -1)
+    if (s->top == -1)
     {
         printf("Stack Underflow\n");
         exit(1);
     }
-    return stack[top--];
+    return s->arr[(s->top)--];
 }
 
-int hasDuplicateParenthesis(char *expr)
+int duplicateParenthesis(char *expr, Stack *s)
 {
     int i;
-    for (i = 0; expr[i]; i++)
+    int len = strlen(expr);
+
+    for (i = 0; i < len; i++)
     {
         char ch = expr[i];
         if (ch == ')')
         {
-            int count = 0;
-            while (top != -1 && stack[top] != '(')
+            char top = pop(s);
+
+            int elementsInside = 0;
+            while (top != '(')
             {
-                pop();
-                count++;
+                elementsInside++;
+                top = pop(s);
             }
-            pop();
-            if (count == 0 && (top != -1 && (stack[top] >= 'a' && stack[top] <= 'z')))
-            {
-                return 1;
-            }
-            else if (count == 0 || stack[top] == ')')
+
+            if (elementsInside <= 1)
             {
                 return 1;
             }
         }
         else
         {
-            push(ch);
+            push(s, ch);
         }
     }
+
     return 0;
 }
 
@@ -66,8 +71,11 @@ int main()
     scanf("%d", &n);
     scanf("%s", expr);
 
-    int result = hasDuplicateParenthesis(expr);
+    Stack s;
+    s.top = -1;
+
+    int result = duplicateParenthesis(expr, &s);
     printf("%d\n", result);
 
-    return 0;
+    return 1;
 }

@@ -133,7 +133,7 @@ void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
             prev->next = current->next;
         }
         free(current);
-        printf("Patient %s %s discharged.\n", name, admitTime);
+        printf("%s %d %s\n", name, current->patient.priority, admitTime);
     }
 }
 
@@ -175,7 +175,7 @@ void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *adm
         }
 
         free(current);
-        printf("Condition severity updated for %s %s.\n", name, admitTime);
+        printf("%s %s.\n", name, admitTime);
     }
 }
 
@@ -234,7 +234,8 @@ int main()
             break;
 
         case 'd':
-            dischargePatient(priorityQueue);
+            scanf(" %s %d %s", name, &priority, admitTime);
+            dischargePatient(priorityQueue, name, admitTime);
             break;
 
         case 'u':

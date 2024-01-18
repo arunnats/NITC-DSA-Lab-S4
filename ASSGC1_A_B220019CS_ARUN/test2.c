@@ -27,14 +27,34 @@ struct pQueue *initializePriorityQueue()
     return priorityQueue;
 }
 
+int comparePatients(struct Patient *a, struct Patient *b)
+{
+    if (a->priority > b->priority)
+        return 1;
+    else if (a->priority < b->priority)
+        return -1;
+    else
+    {
+        int a_hour, a_minute, b_hour, b_minute;
+        sscanf(a->admitTime, "%d:%d", &a_hour, &a_minute);
+        sscanf(b->admitTime, "%d:%d", &b_hour, &b_minute);
+
+        if (a_hour > b_hour || (a_hour == b_hour && a_minute > b_minute))
+            return -1;
+        else if (a_hour < b_hour || (a_hour == b_hour && a_minute < b_minute))
+            return 1;
+        else
+            return 0;
+    }
+}
+
 void insertHeap(struct pQueue *priorityQueue, struct Patient newPatient)
 {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->patient = newPatient;
     newNode->next = NULL;
 
-    if (priorityQueue->front == NULL || newPatient.priority > priorityQueue->front->patient.priority ||
-        (newPatient.priority == priorityQueue->front->patient.priority && strcmp(newPatient.admitTime, priorityQueue->front->patient.admitTime) < 0))
+    if (priorityQueue->front == NULL || comparePatients(&newPatient, &(priorityQueue->front->patient)) > 0)
     {
         newNode->next = priorityQueue->front;
         priorityQueue->front = newNode;
@@ -42,7 +62,7 @@ void insertHeap(struct pQueue *priorityQueue, struct Patient newPatient)
     else
     {
         struct Node *current = priorityQueue->front;
-        while (current->next != NULL && (newPatient.priority < current->next->patient.priority || (newPatient.priority == current->next->patient.priority && strcmp(newPatient.admitTime, current->next->patient.admitTime) >= 0)))
+        while (current->next != NULL && comparePatients(&newPatient, &(current->next->patient)) <= 0)
         {
             current = current->next;
         }
@@ -62,8 +82,6 @@ void removeHeap(struct pQueue *priorityQueue)
     struct Node *temp = priorityQueue->front;
     priorityQueue->front = priorityQueue->front->next;
     free(temp);
-
-    printf("Patient treated and removed from the queue.\n");
 }
 
 void admitPatient(struct pQueue *priorityQueue, char *name, int priority, char *admitTime)
@@ -160,22 +178,26 @@ void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *adm
     }
     else
     {
-        struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-        newNode->patient = current->patient;
-        newNode->patient.priority = newPriority;
-        newNode->next = current->next;
-
         if (prev == NULL)
         {
-            priorityQueue->front = newNode;
+            priorityQueue->front = current->next;
         }
         else
         {
-            prev->next = newNode;
+            prev->next = current->next;
         }
 
         free(current);
-        printf("%s %s.\n", name, admitTime);
+
+        struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+        strcpy(newNode->patient.name, name);
+        newNode->patient.priority = newPriority;
+        strcpy(newNode->patient.admitTime, admitTime);
+        newNode->next = NULL;
+
+        insertHeap(priorityQueue, newNode->patient);
+
+        printf("%s %d %s\n", name, newPriority, admitTime);
     }
 }
 

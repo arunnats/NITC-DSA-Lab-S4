@@ -2,124 +2,207 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Patient
+struct Patient
 {
-    char name[50];
+    char name[1001];
     int priority;
-    char admitTime[10];
-} Patient;
+    char admitTime[1001];
+};
 
-typedef struct PriorityQueue
+struct Node
 {
-    int size;
-    int capacity;
-    Patient *array;
-} PriorityQueue;
+    struct Patient patient;
+    struct Node *next;
+};
 
-PriorityQueue *createQueue(int capacity)
+struct pQueue
 {
-    PriorityQueue *queue = (PriorityQueue *)malloc(sizeof(PriorityQueue));
-    queue->capacity = capacity;
-    queue->size = 0;
-    queue->array = (Patient *)malloc(queue->capacity * sizeof(Patient));
-    return queue;
+    struct Node *front;
+};
+
+struct pQueue *initializePriorityQueue()
+{
+    struct pQueue *priorityQueue = (struct pQueue *)malloc(sizeof(struct pQueue));
+    priorityQueue->front = NULL;
+    return priorityQueue;
 }
 
-void swap(Patient *a, Patient *b)
+void insertHeap(struct pQueue *priorityQueue, struct Patient newPatient)
 {
-    Patient temp = *a;
-    *a = *b;
-    *b = temp;
-}
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->patient = newPatient;
+    newNode->next = NULL;
 
-void heapify(PriorityQueue *queue, int idx)
-{
-    int largest = idx;
-    int left = 2 * idx + 1;
-    int right = 2 * idx + 2;
-
-    if (left < queue->size && queue->array[left].priority > queue->array[largest].priority)
-        largest = left;
-
-    if (right < queue->size && queue->array[right].priority > queue->array[largest].priority)
-        largest = right;
-
-    if (largest != idx)
+    if (priorityQueue->front == NULL || newPatient.priority > priorityQueue->front->patient.priority ||
+        (newPatient.priority == priorityQueue->front->patient.priority && strcmp(newPatient.admitTime, priorityQueue->front->patient.admitTime) < 0))
     {
-        swap(&queue->array[largest], &queue->array[idx]);
-        heapify(queue, largest);
+        newNode->next = priorityQueue->front;
+        priorityQueue->front = newNode;
+    }
+    else
+    {
+        struct Node *current = priorityQueue->front;
+        while (current->next != NULL && (newPatient.priority < current->next->patient.priority || (newPatient.priority == current->next->patient.priority && strcmp(newPatient.admitTime, current->next->patient.admitTime) >= 0)))
+        {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
     }
 }
 
-void admitPatient(PriorityQueue *queue, char *name, int priority, char *admitTime)
+void removeHeap(struct pQueue *priorityQueue)
 {
-    if (queue->size == queue->capacity)
+    if (priorityQueue->front == NULL)
     {
-        printf("Queue is full\n");
+        printf("-1\n");
         return;
     }
 
-    Patient newPatient;
+    struct Node *temp = priorityQueue->front;
+    priorityQueue->front = priorityQueue->front->next;
+    free(temp);
+
+    printf("Patient treated and removed from the queue.\n");
+}
+
+void admitPatient(struct pQueue *priorityQueue, char *name, int priority, char *admitTime)
+{
+    struct Patient newPatient;
     strcpy(newPatient.name, name);
     newPatient.priority = priority;
     strcpy(newPatient.admitTime, admitTime);
 
-    queue->size++;
-    int i = queue->size - 1;
-    queue->array[i] = newPatient;
-
-    while (i != 0 && queue->array[(i - 1) / 2].priority < queue->array[i].priority)
-    {
-        swap(&queue->array[i], &queue->array[(i - 1) / 2]);
-        i = (i - 1) / 2;
-    }
-
-    heapify(queue, 0);
+    insertHeap(priorityQueue, newPatient);
 }
 
-Patient treatNextPatient(PriorityQueue *queue)
+void treatNextPatient(struct pQueue *priorityQueue)
 {
-    if (queue->size <= 0)
+    if (priorityQueue->front == NULL)
     {
-        printf("Queue is empty\n");
-        Patient patient;
-        strcpy(patient.name, "");
-        strcpy(patient.admitTime, "");
-        patient.priority = -1;
-        return patient;
+        printf("-1\n");
     }
-
-    if (queue->size == 1)
+    else
     {
-        queue->size--;
-        return queue->array[0];
+        printf("%s %d %s\n", priorityQueue->front->patient.name, priorityQueue->front->patient.priority, priorityQueue->front->patient.admitTime);
+        removeHeap(priorityQueue);
     }
-
-    Patient root = queue->array[0];
-    queue->array[0] = queue->array[queue->size - 1];
-    queue->size--;
-    heapify(queue, 0);
-
-    return root;
 }
 
-void printPatientsRecursive(PriorityQueue *queue, int index)
+void checkNextPatient(struct pQueue *priorityQueue)
 {
-    if (index >= queue->size)
+    if (priorityQueue->front == NULL)
+    {
+        printf("-1\n");
+    }
+    else
+    {
+        printf("%s %d %s\n", priorityQueue->front->patient.name, priorityQueue->front->patient.priority, priorityQueue->front->patient.admitTime);
+    }
+}
+
+void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
+{
+    if (priorityQueue->front == NULL)
+    {
+        printf("-1\n");
         return;
+    }
 
-    // Print the current patient
-    printf("%s %d %s\n", queue->array[index].name, queue->array[index].priority, queue->array[index].admitTime);
+    struct Node *current = priorityQueue->front;
+    struct Node *prev = NULL;
 
-    // Recursively print left and right children
-    printPatientsRecursive(queue, 2 * index + 2);
-    printPatientsRecursive(queue, 2 * index + 1);
+    while (current != NULL && (strcmp(current->patient.name, name) != 0 || strcmp(current->patient.admitTime, admitTime) != 0))
+    {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current == NULL)
+    {
+        printf("-1\n");
+    }
+    else
+    {
+        if (prev == NULL)
+        {
+            priorityQueue->front = current->next;
+        }
+        else
+        {
+            prev->next = current->next;
+        }
+        free(current);
+        printf("Patient %s %s discharged.\n", name, admitTime);
+    }
 }
 
-void printAllPatients(PriorityQueue *queue)
+void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *admitTime, int newPriority)
 {
-    // Start the recursive printing from the root (highest priority patient)
-    printPatientsRecursive(queue, 0);
+    if (priorityQueue->front == NULL)
+    {
+        printf("-1\n");
+        return;
+    }
+
+    struct Node *current = priorityQueue->front;
+    struct Node *prev = NULL;
+
+    while (current != NULL && (strcmp(current->patient.name, name) != 0 || strcmp(current->patient.admitTime, admitTime) != 0))
+    {
+        prev = current;
+        current = current->next;
+    }
+
+    if (current == NULL)
+    {
+        printf("-1\n");
+    }
+    else
+    {
+        struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+        newNode->patient = current->patient;
+        newNode->patient.priority = newPriority;
+        newNode->next = current->next;
+
+        if (prev == NULL)
+        {
+            priorityQueue->front = newNode;
+        }
+        else
+        {
+            prev->next = newNode;
+        }
+
+        free(current);
+        printf("Condition severity updated for %s %s.\n", name, admitTime);
+    }
+}
+
+void printAllPatients(struct pQueue *priorityQueue)
+{
+    struct Node *current = priorityQueue->front;
+
+    while (current != NULL)
+    {
+        printf("%s %d %s\n", current->patient.name, current->patient.priority, current->patient.admitTime);
+        current = current->next;
+    }
+}
+
+void freePriorityQueue(struct pQueue *priorityQueue)
+{
+    struct Node *current = priorityQueue->front;
+    struct Node *next;
+
+    while (current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    free(priorityQueue);
 }
 
 int main()
@@ -129,7 +212,7 @@ int main()
     int priority;
     char admitTime[1001];
 
-    PriorityQueue *priorityQueue = createQueue(1001);
+    struct pQueue *priorityQueue = initializePriorityQueue();
 
     do
     {
@@ -146,6 +229,19 @@ int main()
             treatNextPatient(priorityQueue);
             break;
 
+        case 'c':
+            checkNextPatient(priorityQueue);
+            break;
+
+        case 'd':
+            dischargePatient(priorityQueue);
+            break;
+
+        case 'u':
+            scanf(" %s %s %d", name, admitTime, &priority);
+            updateConditionSeverity(priorityQueue, name, admitTime, priority);
+            break;
+
         case 'p':
             printAllPatients(priorityQueue);
             break;
@@ -159,8 +255,7 @@ int main()
 
     } while (option != 'e');
 
-    free(priorityQueue->array);
-    free(priorityQueue);
+    freePriorityQueue(priorityQueue);
 
     return 0;
 }

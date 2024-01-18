@@ -143,7 +143,7 @@ void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
                 prev->next = current->next;
             }
 
-            // printf("%s %d %s\n", name, current->patient.priority, admitTime);
+            printf("%s %d %s\n", name, current->patient.priority, admitTime);
             free(current);
             return;
         }
@@ -231,7 +231,7 @@ void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *adm
 
         insertHeap(priorityQueue, newNode->patient);
 
-        // printf("%s %d %s\n", name, newPriority, admitTime);
+        printf("%s %d %s\n", name, newPriority, admitTime);
     }
 }
 

@@ -24,7 +24,7 @@ void push(Stack *S, int x)
 
 int pop(Stack *S)
 {
-    return S->data[--(S->top)];
+    return S->data[S->top--];
 }
 
 Node *createNode(int x)
@@ -59,7 +59,6 @@ Node *listDelete(int index, Node *head)
 {
     if (head == NULL || index <= 0)
     {
-        printf("-1\n");
         return head;
     }
 
@@ -67,7 +66,6 @@ Node *listDelete(int index, Node *head)
     {
         Node *temp = head;
         head = head->next;
-        printf("%d\n", temp->data);
         free(temp);
         return head;
     }
@@ -130,12 +128,6 @@ Node *reverse(Node *head)
 
 int listPal(Node *head)
 {
-    if (head == NULL)
-    {
-        printf("-1\n");
-        return 0;
-    }
-
     Node *reversed = reverse(head);
     Node *currentNode = head;
     Node *currentReversedNode = reversed;
@@ -236,11 +228,16 @@ int main()
             listDisplay(head);
             break;
 
+            /*case 'o':
+                Node *temp = reverse(head);
+                listDisplay(temp);
+                break;*/
+
         default:
             break;
         }
 
     } while (choice != 'e');
 
-    return 0;
+    return 1;
 }

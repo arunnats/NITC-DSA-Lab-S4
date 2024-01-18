@@ -130,30 +130,64 @@ void dischargePatient(struct pQueue *priorityQueue, char *name, char *admitTime)
     struct Node *current = priorityQueue->front;
     struct Node *prev = NULL;
 
-    while (current != NULL && (strcmp(current->patient.name, name) != 0 || strcmp(current->patient.admitTime, admitTime) != 0))
+    while (current != NULL)
     {
+        if (strcmp(current->patient.name, name) == 0 && strcmp(current->patient.admitTime, admitTime) == 0)
+        {
+            if (prev == NULL)
+            {
+                priorityQueue->front = current->next;
+            }
+            else
+            {
+                prev->next = current->next;
+            }
+
+            printf("%s %d %s\n", name, current->patient.priority, admitTime);
+            free(current);
+            return;
+        }
         prev = current;
         current = current->next;
     }
 
-    if (current == NULL)
-    {
-        printf("-1\n");
-    }
-    else
-    {
-        if (prev == NULL)
-        {
-            priorityQueue->front = current->next;
-        }
-        else
-        {
-            prev->next = current->next;
-        }
-        free(current);
-        printf("%s %d %s\n", name, current->patient.priority, admitTime);
-    }
+    printf("-1\n");
 }
+
+// void dischargePatient(struct pQueue *priorityQueue, int priority)
+// {
+//     if (priorityQueue->front == NULL)
+//     {
+//         printf("-1\n");
+//         return;
+//     }
+
+//     struct Node *current = priorityQueue->front;
+//     struct Node *prev = NULL;
+
+//     while (current != NULL)
+//     {
+//         if (current->patient.priority == priority)
+//         {
+//             if (prev == NULL)
+//             {
+//                 priorityQueue->front = current->next;
+//             }
+//             else
+//             {
+//                 prev->next = current->next;
+//             }
+
+//             printf("%s %d %s\n", current->patient.name, current->patient.priority, current->patient.admitTime);
+//             free(current);
+//             return;
+//         }
+//         prev = current;
+//         current = current->next;
+//     }
+
+//     printf("-1\n");
+// }
 
 void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *admitTime, int newPriority)
 {
@@ -255,8 +289,13 @@ int main()
             checkNextPatient(priorityQueue);
             break;
 
+            // case 'd':
+            //     scanf(" %d", priority);
+            //     dischargePatient(priorityQueue, priority);
+            // break;
+
         case 'd':
-            scanf(" %s %d %s", name, &priority, admitTime);
+            scanf(" %s %s", name, admitTime);
             dischargePatient(priorityQueue, name, admitTime);
             break;
 

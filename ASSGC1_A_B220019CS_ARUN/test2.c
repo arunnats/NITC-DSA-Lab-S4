@@ -319,5 +319,5 @@ int main()
 
     freePriorityQueue(priorityQueue);
 
-    return 0;
+    return 1;
 }

@@ -21,26 +21,64 @@ void swap(struct Node *priorityQueue, int i, int j)
     priorityQueue[j] = temp;
 }
 
-void heapify(struct Node *priorityQueue, int index, int i)
+int comparePatients(struct Patient *a, struct Patient *b)
 {
-    int largest = i;
-    int leftChild = 2 * i + 1;
-    int rightChild = 2 * i + 2;
+    if (a->priority > b->priority)
+        return 1;
+    else if (a->priority < b->priority)
+        return -1;
+    else
+    {
+        int a_hour, a_minute, b_hour, b_minute;
+        sscanf(a->admitTime, "%d:%d", &a_hour, &a_minute);
+        sscanf(b->admitTime, "%d:%d", &b_hour, &b_minute);
 
-    if (leftChild < index && priorityQueue[leftChild].patient.priority > priorityQueue[largest].patient.priority)
+        if (a_hour > b_hour || (a_hour == b_hour && a_minute > b_minute))
+            return -1;
+        else if (a_hour < b_hour || (a_hour == b_hour && a_minute < b_minute))
+            return 1;
+        else
+            return 0;
+    }
+}
+
+void heapify(struct Node *priorityQueue, int size, int index)
+{
+    int leftChild = 2 * index + 1;
+    int rightChild = 2 * index + 2;
+    int largest = index;
+
+    if (leftChild < size && comparePatients(&priorityQueue[leftChild].patient, &priorityQueue[largest].patient) > 0)
     {
         largest = leftChild;
     }
 
-    if (rightChild < index && priorityQueue[rightChild].patient.priority > priorityQueue[largest].patient.priority)
+    if (rightChild < size && comparePatients(&priorityQueue[rightChild].patient, &priorityQueue[largest].patient) > 0)
     {
         largest = rightChild;
     }
 
-    if (largest != i)
+    if (largest != index)
     {
-        swap(priorityQueue, i, largest);
-        heapify(priorityQueue, index, largest);
+        swap(priorityQueue, index, largest);
+        heapify(priorityQueue, size, largest);
+    }
+}
+
+void heapifyUp(struct Node *priorityQueue, int index)
+{
+    while (index > 0)
+    {
+        int parent = (index - 1) / 2;
+        if (comparePatients(&priorityQueue[index].patient, &priorityQueue[parent].patient) > 0)
+        {
+            swap(priorityQueue, index, parent);
+            index = parent;
+        }
+        else
+        {
+            break;
+        }
     }
 }
 
@@ -58,11 +96,7 @@ void admitPatient(struct Node *priorityQueue, int *index, char name[], int prior
     int current = *index;
     (*index)++;
 
-    while (current > 0 && priorityQueue[(current - 1) / 2].patient.priority < priorityQueue[current].patient.priority)
-    {
-        swap(priorityQueue, current, (current - 1) / 2);
-        current = (current - 1) / 2;
-    }
+    heapifyUp(priorityQueue, current);
 }
 
 void treatNextPatient(struct Node *priorityQueue, int *index)
@@ -77,8 +111,6 @@ void treatNextPatient(struct Node *priorityQueue, int *index)
 
     swap(priorityQueue, 0, (*index) - 1);
     (*index)--;
-
-    heapify(priorityQueue, *index, 0);
 }
 
 void checkNextPatient(struct Node *priorityQueue, int *index)
@@ -134,7 +166,7 @@ void updateConditionSeverity(struct Node *priorityQueue, int *index, char name[]
 
     priorityQueue[i].patient.priority = newPriority;
 
-    while (i > 0 && priorityQueue[(i - 1) / 2].patient.priority < priorityQueue[i].patient.priority)
+    while (i > 0 && comparePatients(&priorityQueue[i].patient, &priorityQueue[(i - 1) / 2].patient) > 0)
     {
         swap(priorityQueue, i, (i - 1) / 2);
         i = (i - 1) / 2;

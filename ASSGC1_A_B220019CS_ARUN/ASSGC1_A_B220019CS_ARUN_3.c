@@ -187,16 +187,22 @@ void updateConditionSeverity(struct pQueue *priorityQueue, char *name, char *adm
     return;
 }
 
+void printPatientsRecursive(struct pQueue *priorityQueue, int index)
+{
+    if (index >= priorityQueue->size)
+        return;
+
+    printf("%s ", priorityQueue->patients[index].name);
+    printf("%d ", priorityQueue->patients[index].priority);
+    printf("%s\n", priorityQueue->patients[index].admitTime);
+
+    printPatientsRecursive(priorityQueue, 2 * index + 2);
+    printPatientsRecursive(priorityQueue, 2 * index + 1);
+}
+
 void printAllPatients(struct pQueue *priorityQueue)
 {
-    int i;
-    for (i = 1; i <= priorityQueue->size; i++)
-    {
-        printf("%s ", priorityQueue->patients[i].name);
-        printf("%d ", priorityQueue->patients[i].priority);
-        printf("%s\n", priorityQueue->patients[i].admitTime);
-    }
-    return;
+    printPatientsRecursive(priorityQueue, 1);
 }
 
 int main()

@@ -51,7 +51,7 @@ void heapify(PriorityQueue *queue, int idx)
     }
 }
 
-void enqueue(PriorityQueue *queue, Patient patient)
+void admitPatient(PriorityQueue *queue, char *name, int priority, char *admitTime)
 {
     if (queue->size == queue->capacity)
     {
@@ -59,18 +59,25 @@ void enqueue(PriorityQueue *queue, Patient patient)
         return;
     }
 
+    Patient newPatient;
+    strcpy(newPatient.name, name);
+    newPatient.priority = priority;
+    strcpy(newPatient.admitTime, admitTime);
+
     queue->size++;
     int i = queue->size - 1;
-    queue->array[i] = patient;
+    queue->array[i] = newPatient;
 
     while (i != 0 && queue->array[(i - 1) / 2].priority < queue->array[i].priority)
     {
         swap(&queue->array[i], &queue->array[(i - 1) / 2]);
         i = (i - 1) / 2;
     }
+
+    heapify(queue, 0);
 }
 
-Patient dequeue(PriorityQueue *queue)
+Patient treatNextPatient(PriorityQueue *queue)
 {
     if (queue->size <= 0)
     {
@@ -96,34 +103,64 @@ Patient dequeue(PriorityQueue *queue)
     return root;
 }
 
+void printPatientsRecursive(PriorityQueue *queue, int index)
+{
+    if (index >= queue->size)
+        return;
+
+    // Print the current patient
+    printf("%s %d %s\n", queue->array[index].name, queue->array[index].priority, queue->array[index].admitTime);
+
+    // Recursively print left and right children
+    printPatientsRecursive(queue, 2 * index + 2);
+    printPatientsRecursive(queue, 2 * index + 1);
+}
+
+void printAllPatients(PriorityQueue *queue)
+{
+    // Start the recursive printing from the root (highest priority patient)
+    printPatientsRecursive(queue, 0);
+}
+
 int main()
 {
-    PriorityQueue *queue = createQueue(100);
+    char option;
+    char name[1001];
+    int priority;
+    char admitTime[1001];
 
-    Patient patient1;
-    strcpy(patient1.name, "John");
-    strcpy(patient1.admitTime, "10:30");
-    patient1.priority = 5;
-    enqueue(queue, patient1);
+    PriorityQueue *priorityQueue = createQueue(1001);
 
-    Patient patient2;
-    strcpy(patient2.name, "Jane");
-    strcpy(patient2.admitTime, "11:00");
-    patient2.priority = 10;
-    enqueue(queue, patient2);
+    do
+    {
+        scanf(" %c", &option);
 
-    Patient patient3;
-    strcpy(patient3.name, "Bob");
-    strcpy(patient3.admitTime, "10:45");
-    patient3.priority = 7;
-    enqueue(queue, patient3);
+        switch (option)
+        {
+        case 'a':
+            scanf(" %s %d %s", name, &priority, admitTime);
+            admitPatient(priorityQueue, name, priority, admitTime);
+            break;
 
-    Patient nextPatient = dequeue(queue);
-    printf("Next patient: %s %d %s\n", nextPatient.name, nextPatient.priority, nextPatient.admitTime);
-    nextPatient = dequeue(queue);
-    printf("Next patient: %s %d %s\n", nextPatient.name, nextPatient.priority, nextPatient.admitTime);
-    nextPatient = dequeue(queue);
-    printf("Next patient: %s %d %s\n", nextPatient.name, nextPatient.priority, nextPatient.admitTime);
+        case 't':
+            treatNextPatient(priorityQueue);
+            break;
+
+        case 'p':
+            printAllPatients(priorityQueue);
+            break;
+
+        case 'e':
+            break;
+
+        default:
+            break;
+        }
+
+    } while (option != 'e');
+
+    free(priorityQueue->array);
+    free(priorityQueue);
 
     return 0;
 }

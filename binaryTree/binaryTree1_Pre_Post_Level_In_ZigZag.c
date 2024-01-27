@@ -20,6 +20,36 @@ struct Queue
     struct QueueNode *rear;
 };
 
+struct StackNode
+{
+    struct Node *node;
+    struct StackNode *next;
+};
+
+struct Stack
+{
+    struct StackNode *top;
+};
+
+void push(struct Stack *s, struct Node *node)
+{
+    struct StackNode *newNode = (struct StackNode *)malloc(sizeof(struct StackNode));
+    newNode->node = node;
+    newNode->next = s->top;
+    s->top = newNode;
+}
+
+struct Node *pop(struct Stack *s)
+{
+    struct StackNode *temp = s->top;
+    struct Node *node = temp->node;
+
+    s->top = temp->next;
+    free(temp);
+
+    return node;
+}
+
 void enqueue(struct Node *node, struct Queue *Q)
 {
     struct QueueNode *newNode = (struct QueueNode *)malloc(sizeof(struct QueueNode));
@@ -116,6 +146,48 @@ void printLevelOrder(struct Node *root)
     }
 }
 
+void printZigZagOrder(struct Node *root)
+{
+    if (root == NULL)
+        return;
+
+    struct Queue *q = createQueue();
+    struct Stack *s = createStack();
+    int level = 0;
+
+    enqueue(root, q);
+
+    while (q->front != NULL)
+    {
+        int size = q->rear - q->front + 1;
+        for (int i = 0; i < size; i++)
+        {
+            struct Node *currentNode = dequeue(q);
+
+            if (level % 2 == 0)
+            {
+                printf("%d ", currentNode->key);
+            }
+            else
+            {
+                push(s, currentNode);
+            }
+
+            if (currentNode->l)
+                enqueue(currentNode->l, q);
+            if (currentNode->r)
+                enqueue(currentNode->r, q);
+        }
+
+        while (s->top != NULL)
+        {
+            struct Node *reversedNode = pop(s);
+            printf("%d ", reversedNode->key);
+        }
+        level++;
+    }
+}
+
 struct Node *insertNode(struct Node *root, int key)
 {
     if (root == NULL)
@@ -171,6 +243,11 @@ int main()
 
         case 'l':
             printLevelOrder(root);
+            printf("\n");
+            break;
+
+        case 'z':
+            printZigZagOrder(root);
             printf("\n");
             break;
 

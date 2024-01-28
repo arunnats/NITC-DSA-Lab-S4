@@ -167,6 +167,71 @@ void printLevelOrder(struct Node *root)
     }
 }
 
+int diameter(struct Node *root, int *height)
+{
+    int lh = 0, rh = 0, lDiam = 0, rDiam = 0;
+
+    if (root == NULL)
+    {
+        *height = 0;
+        return 0;
+    }
+
+    lDiam = diameter(root->l, &lh);
+    rDiam = diameter(root->r, &rh);
+
+    *height = max(lh, rh) + 1;
+
+    return max(lh + rh + 1, max(lDiam, rDiam));
+}
+
+void levelMax(struct Node *root)
+{
+    if (root == NULL)
+        return;
+
+    struct Queue *q = createQueue();
+
+    enqueue(root, q);
+
+    while (q->front != NULL)
+    {
+        int levelSize = getQueueSize(q);
+        int maxVal = -1;
+
+        for (int i = 0; i < levelSize; i++)
+        {
+            struct Node *temp = dequeue(q);
+            maxVal = max(maxVal, temp->key);
+
+            if (temp->l)
+                enqueue(temp->l, q);
+            if (temp->r)
+                enqueue(temp->r, q);
+        }
+
+        printf("%d ", maxVal);
+    }
+
+    free(q);
+}
+
+int leftLeafSum(struct Node *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int sum = 0;
+
+    if (root->l != NULL && root->l->l == NULL && root->l->r == NULL)
+        sum = sum + root->l->key;
+
+    sum = sum + leftLeafSum(root->l);
+    sum = sum + leftLeafSum(root->r);
+
+    return sum;
+}
+
 struct Node *buildFromPostfix(int inOrder[], int postOrder[], int inStart, int inEnd, int *postIndex)
 {
     if (inStart > inEnd)

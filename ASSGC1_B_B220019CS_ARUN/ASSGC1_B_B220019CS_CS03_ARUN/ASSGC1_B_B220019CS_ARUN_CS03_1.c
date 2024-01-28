@@ -369,5 +369,5 @@ int main()
         }
     } while (option != 'e');
 
-    return 0;
+    return 1;
 }

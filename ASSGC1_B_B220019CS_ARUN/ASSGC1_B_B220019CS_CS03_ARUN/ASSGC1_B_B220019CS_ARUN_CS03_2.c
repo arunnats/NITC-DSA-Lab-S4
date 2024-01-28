@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Helper functions
 
@@ -179,8 +180,58 @@ void rightView(struct Node *root, int level, int *maxlevel)
     rightView(root->l, level + 1, maxlevel);
 }
 
+struct Node *buildTree(char *expression, int start, int end)
+{
+    if (start > end)
+        return NULL;
+
+    int num = 0;
+    while (start <= end && expression[start] >= '0' && expression[start] <= '9')
+    {
+        num *= 10;
+        num += (expression[start] - '0');
+        start++;
+    }
+
+    struct Node *root = initializeNode(num);
+    int count = 0;
+    int index = -1;
+
+    for (int i = start; i <= end; i++)
+    {
+        if (expression[i] == '(')
+            count++;
+        else if (expression[i] == ')')
+            count--;
+
+        if (count == 0)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index != -1)
+    {
+        root->l = buildTree(expression, start + 1, index - 1);
+        root->r = buildTree(expression, index + 2, end - 1);
+    }
+
+    return root;
+}
+
 int main()
 {
+    char expression[1001];
+    fgets(expression, sizeof(expression), stdin);
+    size_t len = strlen(expression);
 
+    if (len > 0 && expression[len - 1] == '\n')
+    {
+        expression[len - 1] = '\0';
+        len--;
+    }
+
+    struct Node *root = buildTree(expression, 0, len - 1);
     return 1;
 }

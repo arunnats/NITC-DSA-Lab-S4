@@ -301,6 +301,22 @@ void levelMax(struct Node *root)
     free(q);
 }
 
+int leftLeafSum(struct Node *root)
+{
+    if (root == NULL)
+        return 0;
+
+    int sum = 0;
+
+    if (root->l != NULL && root->l->l == NULL && root->l->r == NULL)
+        sum = sum + root->l->key;
+
+    sum = sum + leftLeafSum(root->l);
+    sum = sum + leftLeafSum(root->r);
+
+    return sum;
+}
+
 int main()
 {
     int n;
@@ -337,9 +353,13 @@ int main()
             break;
 
         case 'd':
-            printf("%d\n", diameter(root, &height));
+            printf("%d", diameter(root, &height));
+            printf("\n");
             break;
+
         case 's':
+            printf("%d", leftLeafSum(root));
+            printf("\n");
 
             break;
         case 'e':

@@ -60,6 +60,11 @@ struct Node *pop(struct Stack *s)
     return node;
 }
 
+int isEmpty(struct Stack *s)
+{
+    return (s->top == NULL);
+}
+
 struct Queue *createQueue()
 {
     struct Queue *q = (struct Queue *)malloc(sizeof(struct Queue));
@@ -166,48 +171,87 @@ void printLevelOrder(struct Node *root)
     }
 }
 
+// void printZigZagOrder(struct Node *root)
+// {
+//     if (root == NULL)
+//         return;
+
+//     struct Queue *q = createQueue();
+//     struct Stack *s = createStack();
+//     int level = 0;
+
+//     enqueue(root, q);
+
+//     while (q->front != NULL)
+//     {
+//         int size = q->rear - q->front + 1;
+//         for (int i = 0; i < size; i++)
+//         {
+//             struct Node *currentNode = dequeue(q);
+
+//             if (level % 2 == 0)
+//             {
+//                 printf("%d ", currentNode->key);
+//             }
+//             else
+//             {
+//                 push(s, currentNode);
+//             }
+
+//             if (currentNode->l)
+//                 enqueue(currentNode->l, q);
+//             if (currentNode->r)
+//                 enqueue(currentNode->r, q);
+//         }
+
+//         while (s->top != NULL)
+//         {
+//             struct Node *reversedNode = pop(s);
+//             printf("%d ", reversedNode->key);
+//         }
+//         level++;
+//     }
+//     free(q);
+//     free(s);
+// }
+
 void printZigZagOrder(struct Node *root)
 {
     if (root == NULL)
         return;
 
-    struct Queue *q = createQueue();
-    struct Stack *s = createStack();
-    int level = 0;
+    struct Stack *s1 = createStack();
+    struct Stack *s2 = createStack();
 
-    enqueue(root, q);
+    push(s1, root);
 
-    while (q->front != NULL)
+    while (!isEmpty(s1) || !isEmpty(s2))
     {
-        int size = q->rear - q->front + 1;
-        for (int i = 0; i < size; i++)
+        while (!isEmpty(s1))
         {
-            struct Node *currentNode = dequeue(q);
+            struct Node *temp = pop(s1);
+            printf("%d ", temp->key);
 
-            if (level % 2 == 0)
-            {
-                printf("%d ", currentNode->key);
-            }
-            else
-            {
-                push(s, currentNode);
-            }
-
-            if (currentNode->l)
-                enqueue(currentNode->l, q);
-            if (currentNode->r)
-                enqueue(currentNode->r, q);
+            if (temp->l)
+                push(s2, temp->l);
+            if (temp->r)
+                push(s2, temp->r);
         }
 
-        while (s->top != NULL)
+        while (!isEmpty(s2))
         {
-            struct Node *reversedNode = pop(s);
-            printf("%d ", reversedNode->key);
+            struct Node *temp = pop(s2);
+            printf("%d ", temp->key);
+
+            if (temp->r)
+                push(s1, temp->r);
+            if (temp->l)
+                push(s1, temp->l);
         }
-        level++;
     }
-    free(q);
-    free(s);
+
+    free(s1);
+    free(s2);
 }
 
 struct Node *insertNode(struct Node *root, int key)

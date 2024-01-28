@@ -233,5 +233,38 @@ int main()
     }
 
     struct Node *root = buildTree(expression, 0, len - 1);
+
+    int maxlevel = 0;
+
+    char option;
+    do
+    {
+        scanf(" %c", &option);
+        switch (option)
+        {
+
+        case 'l':
+            printLevelOrder(root);
+            printf("\n");
+            break;
+
+        case 'r':
+            rightView(root, 1, &maxlevel);
+            printf("\n");
+            maxlevel = 0;
+            break;
+
+        case 'm':
+
+            break;
+
+        case 'e':
+            break;
+
+        default:
+        }
+
+    } while (option != 'e');
+
     return 1;
 }

@@ -31,6 +31,13 @@ struct Stack
     struct StackNode *top;
 };
 
+struct Stack *createStack()
+{
+    struct Stack *s = (struct Stack *)malloc(sizeof(struct Stack));
+    s->top = NULL;
+    return s;
+}
+
 void push(struct Stack *s, struct Node *node)
 {
     struct StackNode *newNode = (struct StackNode *)malloc(sizeof(struct StackNode));
@@ -41,6 +48,9 @@ void push(struct Stack *s, struct Node *node)
 
 struct Node *pop(struct Stack *s)
 {
+    if (s->top == NULL)
+        return NULL;
+
     struct StackNode *temp = s->top;
     struct Node *node = temp->node;
 
@@ -48,6 +58,13 @@ struct Node *pop(struct Stack *s)
     free(temp);
 
     return node;
+}
+
+struct Queue *createQueue()
+{
+    struct Queue *q = (struct Queue *)malloc(sizeof(struct Queue));
+    q->front = q->rear = NULL;
+    return q;
 }
 
 void enqueue(struct Node *node, struct Queue *Q)
@@ -69,6 +86,9 @@ void enqueue(struct Node *node, struct Queue *Q)
 
 struct Node *dequeue(struct Queue *Q)
 {
+    if (Q->front == NULL)
+        return NULL;
+
     struct QueueNode *temp = Q->front;
     struct Node *node = temp->node;
 
@@ -186,6 +206,8 @@ void printZigZagOrder(struct Node *root)
         }
         level++;
     }
+    free(q);
+    free(s);
 }
 
 struct Node *insertNode(struct Node *root, int key)

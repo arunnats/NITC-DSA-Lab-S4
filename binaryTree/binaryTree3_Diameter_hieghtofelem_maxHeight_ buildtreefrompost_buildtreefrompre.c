@@ -130,7 +130,7 @@ int intMax(int a, int b)
 
 int search(int arr[], int start, int end, int key)
 {
-    for (int i = start; i < end; i++)
+    for (int i = start; i <= end; i++)
     {
         if (key == arr[i])
         {
@@ -162,6 +162,8 @@ void printLevelOrder(struct Node *root)
 
         if (currentNode->r != NULL)
             enqueue(currentNode->r, &Q);
+
+        free(currentNode);
     }
 }
 
@@ -185,64 +187,33 @@ int main()
 {
     struct Node *root = NULL;
 
-    char choice;
-    int x;
-    int maxlevel = 0;
     int len;
-    int inOrder[len];
-    int postOrder[len];
-    int preOrder[len];
     int postIndex;
-    int preIndex;
+    int inOrder[100];
+    int postOrder[100];
 
-    do
+    printf("Enter the length of the postfix traversal: ");
+    scanf("%d", &len);
+
+    printf("Enter the inorder traversal:\n");
+    for (int i = 0; i < len; i++)
     {
-        scanf(" %c", &choice);
+        scanf("%d", &inOrder[i]);
+    }
 
-        switch (choice)
-        {
-        case 'p':
-            scanf("%d", &len);
-            for (int i = 0; i < len; i++)
-            {
-                scanf("d", &inOrder[i]);
-            }
-            for (int i = 0; i < len; i++)
-            {
-                scanf("d", &postOrder[i]);
-            }
-            root = buildFromPostfix(inOrder, postOrder, <>);
-            break;
+    printf("Enter the postfix traversal:\n");
+    for (int i = 0; i < len; i++)
+    {
+        scanf("%d", &postOrder[i]);
+    }
 
-        case 'r':
-            buildFromPrefix();
-            break;
+    postIndex = len - 1;
 
-        case 'l':
-            printLevelOrder(root);
-            printf("\n");
-            break;
+    root = buildFromPostfix(inOrder, postOrder, 0, len - 1, &postIndex);
 
-        case 'd':
-            diameter();
-            break;
-
-        case 'h':
-            maxHeight();
-            break;
-
-        case 'n':
-            heightOfNode();
-            break;
-
-        case 'e':
-            break;
-
-        default:
-            printf("Invalid choice\n");
-        }
-
-    } while (choice != 'e');
+    printf("Level Order Traversal: ");
+    printLevelOrder(root);
+    printf("\n");
 
     return 0;
 }

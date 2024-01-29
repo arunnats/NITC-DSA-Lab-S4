@@ -183,6 +183,39 @@ struct Node *buildTree(char *expression, int start, int end)
     return root;
 }
 
+int printAncestors(struct Node *root, int key)
+{
+    if (root == NULL)
+        return 0;
+
+    if (root->key == key)
+        return 1;
+
+    if (printAncestors(root->l, key) || printAncestors(root->r, key))
+    {
+        printf("%d ", root->key);
+        return 1;
+    }
+
+    return 0;
+}
+
+void printRangeOrder(struct Node *root, int k1, int k2)
+{
+    if (root == NULL)
+        return;
+
+    if (root->key >= k1 && root->key <= k2)
+    {
+        printf("%d ", root->key);
+    }
+
+    if (root->key > k1)
+        printRangeOrder(root->l, k1, k2);
+    if (root->key < k2)
+        printRangeOrder(root->r, k1, k2);
+}
+
 int main()
 {
     char expression[1001];
@@ -198,7 +231,8 @@ int main()
     struct Node *root = buildTree(expression, 0, len - 1);
 
     int maxlevel = 0;
-
+    int key;
+    int k1, k2;
     char option;
     do
     {
@@ -206,15 +240,15 @@ int main()
         switch (option)
         {
 
-        case 'l':
-            printLevelOrder(root);
-            printf("\n");
+        case 'p':
+            scanf("%d", &key);
+            printAncestors(root, key);
             break;
 
-        case 'r':
-            rightView(root, 1, &maxlevel);
+        case 'a':
+            scanf("%d %d", &k1, &k2);
+            printRangeOrder(root, k1, k2);
             printf("\n");
-            maxlevel = 0;
             break;
 
         case 'e':

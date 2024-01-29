@@ -284,13 +284,45 @@ int isBST(struct Node *root)
 int sumElem(struct Node *root, int *sum)
 {
     if (root == NULL)
-        return *sum;
+        return 0;
 
-    sumElem(root->l, sum);
-    sumElem(root->r, sum);
+    int leftSum = sumElem(root->l, sum);
+    int rightSum = sumElem(root->r, sum);
+
     *sum = *sum + root->key;
 
-    return *sum;
+    return leftSum + rightSum + root->key;
+}
+
+void maximumSumBST(struct Node *root, int *maximumSum)
+{
+    if (root == NULL)
+        return;
+
+    int tempSum = 0;
+
+    maximumSumBST(root->l, &tempSum);
+
+    if (isBST(root))
+    {
+        tempSum = sumElem(root, &tempSum);
+        if (tempSum > *maximumSum)
+        {
+            *maximumSum = tempSum;
+        }
+    }
+
+    maximumSumBST(root->r, maximumSum);
+}
+
+int maximumSumBSTCall(struct Node *root)
+{
+    int maximumSum = 0;
+
+    maximumSumBST(root->l, &maximumSum);
+    maximumSumBST(root->r, &maximumSum);
+
+    return maximumSum;
 }
 
 int main()
@@ -328,7 +360,7 @@ int main()
             break;
 
         case 'm':
-
+            printf("%d \n", maximumSumBSTCall(root));
             break;
 
         case 'e':

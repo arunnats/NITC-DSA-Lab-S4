@@ -143,6 +143,29 @@ int search(int arr[], int start, int end, int key)
 
 // End of Helper functions
 
+void printLevelOrder(struct Node *root) // for testing
+{
+    if (root == NULL)
+        return;
+
+    struct Queue Q;
+    Q.front = Q.rear = NULL;
+
+    enqueue(root, &Q);
+
+    while (Q.front != NULL)
+    {
+        struct Node *currentNode = dequeue(&Q);
+        printf("%d ", currentNode->key);
+
+        if (currentNode->l != NULL)
+            enqueue(currentNode->l, &Q);
+
+        if (currentNode->r != NULL)
+            enqueue(currentNode->r, &Q);
+    }
+}
+
 struct Node *buildTree(char *expression, int start, int end)
 {
     if (start > end)
@@ -183,15 +206,29 @@ struct Node *buildTree(char *expression, int start, int end)
     return root;
 }
 
+// int printAncestors(struct Node *root, int key)
+// {
+//     if (root == NULL)
+//         return 0;
+
+//     if (root->key == key)
+//         return 1;
+
+//     if (printAncestors(root->l, key) || printAncestors(root->r, key))
+//     {
+//         printf("%d ", root->key);
+//         return 1;
+//     }
+
+//     return 0;
+// }
+
 int printAncestors(struct Node *root, int key)
 {
     if (root == NULL)
         return 0;
 
-    if (root->key == key)
-        return 1;
-
-    if (printAncestors(root->l, key) || printAncestors(root->r, key))
+    if (root->key == key || printAncestors(root->l, key) || printAncestors(root->r, key))
     {
         printf("%d ", root->key);
         return 1;
@@ -271,6 +308,9 @@ int main()
     }
 
     struct Node *root = buildTree(expression, 0, len - 1);
+
+    // printLevelOrder(root);
+    // printf("\n");
 
     int maxlevel = 0;
     int key;

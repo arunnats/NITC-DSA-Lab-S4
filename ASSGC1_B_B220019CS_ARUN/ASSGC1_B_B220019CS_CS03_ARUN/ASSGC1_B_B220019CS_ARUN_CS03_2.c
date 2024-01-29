@@ -220,6 +220,79 @@ struct Node *buildTree(char *expression, int start, int end)
     return root;
 }
 
+int maxValue(struct Node *root)
+{
+    if (root == NULL)
+        return -1;
+
+    int value = root->key;
+
+    int leftMax = maxValue(root->l);
+    int rightMax = maxValue(root->r);
+
+    int result = value;
+
+    if (leftMax != -1 && leftMax > result)
+        result = leftMax;
+
+    if (rightMax != -1 && rightMax > result)
+        result = rightMax;
+
+    return result;
+}
+
+int minValue(struct Node *root)
+{
+    if (root == NULL)
+        return -1;
+
+    int value = root->key;
+
+    int leftMin = minValue(root->l);
+    int rightMin = minValue(root->r);
+
+    int result = value;
+
+    if (leftMin != -1 && leftMin < result)
+        result = leftMin;
+
+    if (rightMin != -1 && rightMin < result)
+        result = rightMin;
+
+    return result;
+}
+
+int isBST(struct Node *root)
+{
+    if (root == NULL)
+        return 1;
+
+    int leftMax = maxValue(root->l);
+    int rightMin = maxValue(root->r);
+
+    if ((root->l != NULL && leftMax >= root->key) || (root->r != NULL && rightMin <= root->key))
+        return 0;
+
+    if (!isBST(root->l) || !isBST(root->l))
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int sumElem(struct Node *root, int *sum)
+{
+    if (root == NULL)
+        return *sum;
+
+    sumElem(root->l, sum);
+    sumElem(root->r, sum);
+    *sum = *sum + root->key;
+
+    return *sum;
+}
+
 int main()
 {
     char expression[1001];

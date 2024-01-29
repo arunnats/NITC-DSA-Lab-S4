@@ -319,8 +319,9 @@ int maximumSumBSTCall(struct Node *root)
 {
     int maximumSum = 0;
 
-    maximumSumBST(root->l, &maximumSum);
-    maximumSumBST(root->r, &maximumSum);
+    // maximumSumBST(root->l, &maximumSum);
+    // maximumSumBST(root->r, &maximumSum);
+    maximumSumBST(root, &maximumSum);
 
     return maximumSum;
 }

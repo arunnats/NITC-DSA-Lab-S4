@@ -200,20 +200,62 @@ int printAncestors(struct Node *root, int key)
     return 0;
 }
 
+// void printRangeOrder(struct Node *root, int k1, int k2)
+// {
+//     if (root == NULL)
+//         return;
+
+//     if (root->key >= k1 && root->key <= k2)
+//     {
+//         printf("%d ", root->key);
+//     }
+
+//     if (root->key > k1)
+//         printRangeOrder(root->l, k1, k2);
+//     if (root->key < k2)
+//         printRangeOrder(root->r, k1, k2);
+// }
+
 void printRangeOrder(struct Node *root, int k1, int k2)
 {
     if (root == NULL)
         return;
 
-    if (root->key >= k1 && root->key <= k2)
+    struct Node *currentNode = root;
+    while (currentNode != NULL)
     {
-        printf("%d ", root->key);
-    }
+        if (currentNode->l == NULL)
+        {
+            if (k1 <= currentNode->key && k2 >= currentNode->key)
+            {
+                printf("%d ", currentNode->key);
+            }
+            currentNode = currentNode->r;
+        }
+        else
+        {
+            struct Node *prevNode = currentNode->l;
+            while (prevNode->r != NULL && prevNode->r != currentNode)
+            {
+                prevNode = prevNode->r;
+            }
 
-    if (root->key > k1)
-        printRangeOrder(root->l, k1, k2);
-    if (root->key < k2)
-        printRangeOrder(root->r, k1, k2);
+            if (prevNode->r == NULL)
+            {
+                prevNode->r = currentNode;
+                currentNode = currentNode->l;
+            }
+            else
+            {
+                prevNode->r = NULL;
+                if (k1 <= currentNode->key && k2 >= currentNode->key)
+                {
+                    printf("%d ", currentNode->key);
+                }
+                currentNode = currentNode->r;
+            }
+        }
+    }
 }
 
 int main()

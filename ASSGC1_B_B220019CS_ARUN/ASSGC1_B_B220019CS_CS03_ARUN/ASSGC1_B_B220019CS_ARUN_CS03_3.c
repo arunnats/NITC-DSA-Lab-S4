@@ -223,18 +223,25 @@ struct Node *buildTree(char *expression, int start, int end)
 //     return 0;
 // }
 
-int printAncestors(struct Node *root, int key)
+void printAncestors(struct Node *root, int key)
 {
     if (root == NULL)
-        return 0;
+        return;
 
-    if (root->key == key || printAncestors(root->l, key) || printAncestors(root->r, key))
+    if (key < root->key)
+    {
+        printAncestors(root->l, key);
+        printf("%d ", root->key);
+    }
+    else if (key > root->key)
+    {
+        printAncestors(root->r, key);
+        printf("%d ", root->key);
+    }
+    else
     {
         printf("%d ", root->key);
-        return 1;
     }
-
-    return 0;
 }
 
 // void printRangeOrder(struct Node *root, int k1, int k2)
@@ -253,46 +260,19 @@ int printAncestors(struct Node *root, int key)
 //         printRangeOrder(root->r, k1, k2);
 // }
 
-void printRangeOrder(struct Node *root, int k1, int k2)
+void printRangeValues(struct Node *root, int k1, int k2)
 {
     if (root == NULL)
         return;
 
-    struct Node *currentNode = root;
-    while (currentNode != NULL)
-    {
-        if (currentNode->l == NULL)
-        {
-            if (k1 <= currentNode->key && k2 >= currentNode->key)
-            {
-                printf("%d ", currentNode->key);
-            }
-            currentNode = currentNode->r;
-        }
-        else
-        {
-            struct Node *prevNode = currentNode->l;
-            while (prevNode->r != NULL && prevNode->r != currentNode)
-            {
-                prevNode = prevNode->r;
-            }
+    if (root->key > k1)
+        printRangeValues(root->l, k1, k2);
 
-            if (prevNode->r == NULL)
-            {
-                prevNode->r = currentNode;
-                currentNode = currentNode->l;
-            }
-            else
-            {
-                prevNode->r = NULL;
-                if (k1 <= currentNode->key && k2 >= currentNode->key)
-                {
-                    printf("%d ", currentNode->key);
-                }
-                currentNode = currentNode->r;
-            }
-        }
-    }
+    if (root->key >= k1 && root->key <= k2)
+        printf("%d ", root->key);
+
+    if (root->key < k2)
+        printRangeValues(root->r, k1, k2);
 }
 
 int main()
@@ -322,14 +302,15 @@ int main()
         switch (option)
         {
 
-        case 'p':
+        case 'a':
             scanf("%d", &key);
             printAncestors(root, key);
+            printf("\n");
             break;
 
-        case 'a':
+        case 'p':
             scanf("%d %d", &k1, &k2);
-            printRangeOrder(root, k1, k2);
+            printRangeValues(root, k1, k2);
             printf("\n");
             break;
 

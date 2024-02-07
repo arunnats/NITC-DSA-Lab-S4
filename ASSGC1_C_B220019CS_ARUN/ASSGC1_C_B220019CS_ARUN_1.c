@@ -35,7 +35,7 @@ struct HashMap *clearHashmap(struct HashMap *map, int maxSize)
 {
     for (int i = 0; i < maxSize; i++)
     {
-        map->array[i] == NULL;
+        map->array[i] = NULL;
     }
     return map;
 }
@@ -56,21 +56,71 @@ void insertLinear(struct HashMap *map, int key, char value)
     map->array[index] = newNode;
 }
 
+int search(struct HashMap *map, int key)
+{
+    int index = hashFunction(key);
+
+    while (map->array[index] != NULL)
+    {
+        if (map->array[index]->key == key)
+        {
+            return map->array[index]->value;
+        }
+        index = (index + 1) % SIZE;
+    }
+
+    return -1;
+}
+
 void unionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
     for (int i = 0; i < sizeA; i++)
     {
-        insertLinear(&map, A[i], 'A');
+        insertLinear(map, A[i], 'A');
         printf("%d ", A[i]);
+    }
+
+    for (int i = 0; i < sizeB; i++)
+    {
+        if (search(map, B[i]) == -1)
+        {
+            insertLinear(map, B[i], 'B');
+            printf("%d ", B[i]);
+        }
     }
 }
 
-void intersectionFunc(int *A, int *B, int maxSize, struct HashMap *map)
+void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    for (int i = 0; i < sizeB; i++)
+    {
+        insertLinear(map, B[i], 'B');
+    }
+
+    for (int i = 0; i < sizeA; i++)
+    {
+        if (search(map, A[i]) != -1)
+        {
+            printf("%d ", A[i]);
+        }
+    }
 }
 
-void setDifferenceFunc(int *A, int *B, int maxSize, struct HashMap *map)
+void setDifferenceFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    for (int i = 0; i < sizeA; i++)
+    {
+        insertLinear(map, A[i], 'A');
+        printf("%d ", A[i]);
+    }
+
+    for (int i = 0; i < sizeB; i++)
+    {
+        if (search(map, B[i]) == -1)
+        {
+            printf("%d ", B[i]);
+        }
+    }
 }
 
 int main()
@@ -93,26 +143,26 @@ int main()
         scanf(" %c", &option);
         switch (option)
         {
-
         case 'u':
-            unionFunc(A, B, maxSize, &map);
+            unionFunc(A, B, sizeA, sizeB, maxSize, map);
             printf("\n");
-            map = clearHashmap(&map, maxSize);
+            map = clearHashmap(map, maxSize);
+            break;
 
         case 'i':
-            intersectionFunc(A, B, maxSize, &map);
+            intersectionFunc(A, B, sizeA, sizeB, maxSize, map);
             printf("\n");
-            map = clearHashmap(&map, maxSize);
+            map = clearHashmap(map, maxSize);
+            break;
 
         case 's':
-            setDifferenceFunc(A, B, maxSize, &map);
+            setDifferenceFunc(A, B, sizeA, sizeB, maxSize, map);
             printf("\n");
-            map = clearHashmap(&map, maxSize);
+            map = clearHashmap(map, maxSize);
+            break;
 
         case 'e':
             break;
-
-        default:
         }
 
     } while (option != 'e');

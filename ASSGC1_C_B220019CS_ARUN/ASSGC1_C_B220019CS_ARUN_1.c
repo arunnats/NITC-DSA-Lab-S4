@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define SIZE 100
+#define SIZE 200
 #define EMPTY -1
 
 struct Node
@@ -74,6 +73,8 @@ int search(struct HashMap *map, int key)
 
 void unionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    clearHashmap(map, maxSize);
+
     for (int i = 0; i < sizeA; i++)
     {
         insertLinear(map, A[i]);
@@ -92,6 +93,8 @@ void unionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap
 
 void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    clearHashmap(map, maxSize);
+
     for (int i = 0; i < sizeB; i++)
     {
         insertLinear(map, B[i]);
@@ -108,17 +111,18 @@ void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct 
 
 void setDifferenceFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
-    for (int i = 0; i < sizeA; i++)
-    {
-        insertLinear(map, A[i]);
-        printf("%d ", A[i]);
-    }
+    clearHashmap(map, maxSize);
 
     for (int i = 0; i < sizeB; i++)
     {
-        if (!search(map, B[i]))
+        insertLinear(map, B[i]);
+    }
+
+    for (int i = 0; i < sizeA; i++)
+    {
+        if (!search(map, A[i]))
         {
-            printf("%d ", B[i]);
+            printf("%d ", A[i]);
         }
     }
 }
@@ -129,7 +133,6 @@ int main()
     scanf("%d %d", &sizeA, &sizeB);
     int A[sizeA];
     int B[sizeB];
-    int maxSize = 2 * (sizeA + sizeB);
 
     for (int i = 0; i < sizeA; i++)
     {
@@ -140,9 +143,11 @@ int main()
     {
         scanf("%d", &B[i]);
     }
-
+    int maxSize = 2 * (sizeA + sizeB);
     struct HashMap *map = createHashmap(maxSize);
+
     char char1, char2;
+
     char option;
     do
     {
@@ -170,7 +175,11 @@ int main()
             break;
 
         case 's':
-            setDifferenceFunc(A, B, sizeA, sizeB, maxSize, map);
+            scanf(" %c %c", &char1, &char2);
+            if (char1 == 'A' && char2 == 'B')
+                setDifferenceFunc(A, B, sizeA, sizeB, maxSize, map);
+            else
+                setDifferenceFunc(B, A, sizeA, sizeB, maxSize, map);
             printf("\n");
             clearHashmap(map, maxSize);
             break;

@@ -109,15 +109,11 @@ void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct 
 
 void setDifferenceFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
-    // Insert elements from array A into the hashmap
     for (int i = 0; i < sizeA; i++)
     {
         insertLinear(map, A[i]);
-        printf("%d ", A[i]);
     }
 
-    // Clear the hashmap before processing array B
-    // Process elements from array B and print the set difference
     for (int i = 0; i < sizeB; i++)
     {
         if (!search(map, B[i]))

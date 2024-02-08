@@ -39,22 +39,6 @@ struct HashMap *clearHashmap(struct HashMap *map, int maxSize)
     return map;
 }
 
-void insertLinear(struct HashMap *map, int key)
-{
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-
-    newNode->key = key;
-
-    int index = hashFunction(key);
-
-    while (map->array[index] != NULL)
-    {
-        index = (index + 1) % SIZE;
-    }
-
-    map->array[index] = newNode;
-}
-
 int search(struct HashMap *map, int key)
 {
     int index = hashFunction(key);
@@ -69,6 +53,27 @@ int search(struct HashMap *map, int key)
     }
 
     return 0;
+}
+
+void insertLinear(struct HashMap *map, int key)
+{
+    if (search(map, key) == 1)
+    {
+        return;
+    }
+
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    newNode->key = key;
+
+    int index = hashFunction(key);
+
+    while (map->array[index] != NULL)
+    {
+        index = (index + 1) % SIZE;
+    }
+
+    map->array[index] = newNode;
 }
 
 void unionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)

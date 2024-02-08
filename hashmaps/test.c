@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define SIZE 100
+#define SIZE 200
 #define EMPTY -1
 
 struct Node
@@ -92,6 +91,8 @@ void unionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap
 
 void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    clearHashmap(map, maxSize);
+
     for (int i = 0; i < sizeB; i++)
     {
         insertLinear(map, B[i]);
@@ -108,12 +109,15 @@ void intersectionFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct 
 
 void setDifferenceFunc(int *A, int *B, int sizeA, int sizeB, int maxSize, struct HashMap *map)
 {
+    // Insert elements from array A into the hashmap
     for (int i = 0; i < sizeA; i++)
     {
         insertLinear(map, A[i]);
         printf("%d ", A[i]);
     }
 
+    // Clear the hashmap before processing array B
+    // Process elements from array B and print the set difference
     for (int i = 0; i < sizeB; i++)
     {
         if (!search(map, B[i]))
@@ -142,7 +146,7 @@ int main()
     }
 
     struct HashMap *map = createHashmap(maxSize);
-    char char1, char2;
+
     char option;
     do
     {
@@ -150,21 +154,13 @@ int main()
         switch (option)
         {
         case 'u':
-            scanf(" %c %c", &char1, &char2);
-            if (char1 == 'A' && char2 == 'B')
-                unionFunc(A, B, sizeA, sizeB, maxSize, map);
-            else
-                unionFunc(B, A, sizeA, sizeB, maxSize, map);
+            unionFunc(A, B, sizeA, sizeB, maxSize, map);
             printf("\n");
             clearHashmap(map, maxSize);
             break;
 
         case 'i':
-            scanf(" %c %c", &char1, &char2);
-            if (char1 == 'A' && char2 == 'B')
-                intersectionFunc(A, B, sizeA, sizeB, maxSize, map);
-            else
-                intersectionFunc(B, A, sizeA, sizeB, maxSize, map);
+            intersectionFunc(A, B, sizeA, sizeB, maxSize, map);
             printf("\n");
             clearHashmap(map, maxSize);
             break;

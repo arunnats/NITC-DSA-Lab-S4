@@ -98,7 +98,5 @@ int main()
 
     countDistinct(map, arr, N, K);
 
-    free(map);
-
     return 1;
 }

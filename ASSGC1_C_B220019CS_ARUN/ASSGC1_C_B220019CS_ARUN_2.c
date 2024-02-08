@@ -179,7 +179,5 @@ int main()
 
     } while (option != 'e');
 
-    free(map);
-
     return 1;
 }

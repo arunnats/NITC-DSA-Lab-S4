@@ -93,31 +93,6 @@ void displayStudentList(int groupNum, struct HashMap *map)
     printf("\n");
 }
 
-void displayBranchStudentList(int groupNum, char branch[], struct HashMap *map)
-{
-    struct Student *current = map->list[groupNum];
-    int found = 0;
-
-    while (current != NULL)
-    {
-        if (strcmp(current->branch, branch) == 0)
-        {
-            printf("%s ", current->firstName);
-            found = 1;
-        }
-        current = current->next;
-    }
-
-    if (!found)
-    {
-        printf("-1\n");
-    }
-    else
-    {
-        printf("\n");
-    }
-}
-
 int main()
 {
     int n;
@@ -128,33 +103,45 @@ int main()
 
     populateHashMap(&map, n);
 
+    char branch[2];
     char option;
+
     do
     {
         scanf(" %c", &option);
-        if (option != 'e')
+        switch (option)
         {
-            if (option == 'c')
-            {
-                int k;
-                scanf("%d", &k);
-                displayCount(k, &map);
-                printf("\n");
-            }
-            else
-            {
-                int m;
-                char branch[3];
-                if (scanf("%d", &m) == 1 && m >= 0 && m <= 3)
-                {
-                    displayStudentList(m, &map);
-                }
-                else
-                {
-                    printf("Invalid option or group number\n");
-                }
-            }
+        case 'c':
+            int k;
+            scanf("%d", &k);
+            displayCount(k, &map);
+            printf("\n");
+            break;
+
+        case '0':
+            scanf("%s", &branch);
+            displayBranchStudentList(0, branch, &map);
+            break;
+
+        case '1':
+            scanf("%s", &branch);
+            displayBranchStudentList(1, branch, &map);
+            break;
+
+        case '2':
+            scanf("%s", &branch);
+            displayBranchStudentList(2, branch, &map);
+            break;
+
+        case '3':
+            scanf("%s", &branch);
+            displayBranchStudentList(3, branch, &map);
+            break;
+
+        case 'e':
+            break;
         }
+
     } while (option != 'e');
 
     return 0;

@@ -64,9 +64,9 @@ void countDistinct(struct HashMap *map, int arr[], int N, int K)
 
         for (int j = 0; j < K; j++)
         {
-            if (!search(windowMap, arr[i + j], k))
+            if (!search(windowMap, arr[i + j], K))
             {
-                insert(windowMap, arr[i + j], k);
+                insert(windowMap, arr[i + j], K);
                 distinctCount++;
             }
         }

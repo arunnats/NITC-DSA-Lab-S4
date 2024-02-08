@@ -36,10 +36,10 @@ void initializeHashMap(struct HashMap *map)
 
 void insertStudent(struct Student *newStudent, struct HashMap *map)
 {
-    int groupIndex = hashFunction(newStudent->firstName, newStudent->age);
+    int groupNum = hashFunction(newStudent->firstName, newStudent->age);
 
-    newStudent->next = map->list[groupIndex];
-    map->list[groupIndex] = newStudent;
+    newStudent->next = map->list[groupNum];
+    map->list[groupNum] = newStudent;
 }
 
 void populateHashMap(struct HashMap *map, int n)
@@ -55,10 +55,107 @@ void populateHashMap(struct HashMap *map, int n)
     }
 }
 
+void displayCountAndNames(int count, struct Student *current)
+{
+    if (current != NULL)
+    {
+        displayCountAndNames(count - 1, current->next);
+        printf("%s ", current->firstName);
+    }
+}
+
+void displayCount(int groupNum, struct HashMap *map)
+{
+    int count = 0;
+    struct Student *current = map->list[groupNum];
+
+    while (current != NULL)
+    {
+        count++;
+        current = current->next;
+    }
+
+    printf("%d ", count);
+
+    displayCountAndNames(count, map->list[groupNum]);
+}
+
+void displayStudentList(int groupNum, struct HashMap *map)
+{
+    struct Student *current = map->list[groupNum];
+
+    while (current != NULL)
+    {
+        printf("%s ", current->firstName);
+        current = current->next;
+    }
+
+    printf("\n");
+}
+
+void displayBranchStudentList(int groupNum, char branch[], struct HashMap *map)
+{
+    struct Student *current = map->list[groupNum];
+    int found = 0;
+
+    while (current != NULL)
+    {
+        if (strcmp(current->branch, branch) == 0)
+        {
+            printf("%s ", current->firstName);
+            found = 1;
+        }
+        current = current->next;
+    }
+
+    if (!found)
+    {
+        printf("-1\n");
+    }
+    else
+    {
+        printf("\n");
+    }
+}
+
 int main()
 {
     int n;
     scanf("%d", &n);
 
-        return 1;
+    struct HashMap map;
+    initializeHashMap(&map);
+
+    populateHashMap(&map, n);
+
+    char option;
+    do
+    {
+        scanf(" %c", &option);
+        if (option != 'e')
+        {
+            if (option == 'c')
+            {
+                int k;
+                scanf("%d", &k);
+                displayCount(k, &map);
+                printf("\n");
+            }
+            else
+            {
+                int m;
+                char branch[3];
+                if (scanf("%d", &m) == 1 && m >= 0 && m <= 3)
+                {
+                    displayStudentList(m, &map);
+                }
+                else
+                {
+                    printf("Invalid option or group number\n");
+                }
+            }
+        }
+    } while (option != 'e');
+
+    return 0;
 }

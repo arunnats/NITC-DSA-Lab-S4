@@ -55,14 +55,14 @@ int search(struct HashMap *map, int key, int N)
     return 0;
 }
 
-void countDistinct(struct HashMap *map, int arr[], int N, int K)
+void countDistinct(struct HashMap *map, int arr[], int n, int k)
 {
-    for (int i = 0; i <= N - K; i++)
+    for (int i = 0; i <= n - k; i++)
     {
         int distinctCount = 0;
-        struct HashMap *windowMap = createHashMap(K);
+        struct HashMap *windowMap = createHashMap(k);
 
-        for (int j = 0; j < K; j++)
+        for (int j = 0; j < k; j++)
         {
             if (!search(windowMap, arr[i + j], k))
             {
@@ -91,14 +91,16 @@ int main()
 
     struct HashMap *map = createHashMap(N);
 
+    // Insert the first K elements into the hashmap
     for (int i = 0; i < K; i++)
     {
         insert(map, arr[i], N);
     }
 
+    // Call function to count distinct integers in each window of size K
     countDistinct(map, arr, N, K);
 
     free(map);
 
-    return 1;
+    return 0;
 }

@@ -55,6 +55,40 @@ void insertLinear(Node **hashTable, int key, int *count, int n)
     hashTable[(index + temp) % n] = newNode;
     printf("%d ", (index + temp) % n);
 }
+
+void insertQuad(Node **hashTable, int key, int *count, int n)
+{
+    int index = key % n;
+    Node *newNode = createNode(key);
+
+    int temp = 0;
+
+    while (hashTable[(index + temp * temp) % n] != NULL)
+    {
+        (*count)++;
+        temp++;
+    }
+
+    hashTable[(index + temp * temp) % n] = newNode;
+    printf("%d ", (index + temp * temp) % n);
+}
+
+void insertDouble(Node **hashTable, int key, int *count, int n)
+{
+    int index = key % n;
+    int index2 = findPrime(n) - key % findPrime(n);
+    Node *newNode = createNode(key);
+
+    int temp = 0;
+
+    while (hashTable[(index + temp * index2) % n] != NULL)
+    {
+        (*count)++;
+        temp++;
+    }
+
+    hashTable[(index + temp * index2) % n] = newNode;
+    printf("%d ", (index + temp * index2) % n);
 }
 
 int main()

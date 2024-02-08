@@ -4,145 +4,196 @@
 
 struct Student
 {
-    char firstName[30];
-    char rollNumber[20];
-    int age;
+    char firstName[100];
     char branch[3];
     struct Student *next;
 };
 
-struct HashMap
-{
-    struct Student *list[4];
-};
+typedef struct Student Student;
 
-int hashFunction(char firstName[], int age)
+int hashFunction(char *name, int age)
 {
     int sum = 0;
-    for (int i = 0; i < strlen(firstName); i++)
+    int i = 0;
+
+    while (i < strlen(name))
     {
-        sum += (int)firstName[i];
+        sum += name[i++];
     }
+
     return (sum + age) % 4;
 }
 
-void initializeHashMap(struct HashMap *map)
+void initializeHashMap(Student *map[4])
 {
     for (int i = 0; i < 4; i++)
     {
-        map->list[i] = NULL;
+        map[i] = NULL;
     }
 }
 
-void insertStudent(struct Student *newStudent, struct HashMap *map)
+void convertToLowercase(char *str)
 {
-    int groupNum = hashFunction(newStudent->firstName, newStudent->age);
-
-    newStudent->next = map->list[groupNum];
-    map->list[groupNum] = newStudent;
-}
-
-void populateHashMap(struct HashMap *map, int n)
-{
-    for (int i = 0; i < n; i++)
+    if (str[0] >= 'A' && str[0] <= 'Z')
     {
-        struct Student *newStudent = (struct Student *)malloc(sizeof(struct Student));
-        scanf("%s %s %d", newStudent->firstName, newStudent->rollNumber, &newStudent->age);
-        newStudent->branch[0] = newStudent->rollNumber[9];
-        newStudent->branch[1] = newStudent->rollNumber[10];
-        newStudent->branch[2] = '\0';
-        insertStudent(newStudent, map);
+        str[0] = str[0] + ('a' - 'A');
+    }
+
+    if (str[1] >= 'A' && str[1] <= 'Z')
+    {
+        str[1] = str[1] + ('a' - 'A');
     }
 }
 
-void displayCountAndNames(int count, struct Student *current)
+void insert(Student *hash_table[4], char *name, char *branch, int age)
+{
+    int index = hashFunction(name, age);
+    Student *newStudent = (Student *)malloc(sizeof(Student));
+    strcpy(newStudent->firstName, name);
+    convertToLowercase(branch);
+    strcpy(newStudent->branch, branch);
+    newStudent->next = NULL;
+
+    if (hash_table[index] == NULL)
+    {
+        hash_table[index] = newStudent;
+    }
+    else
+    {
+        Student *temp = hash_table[index];
+        while (temp->next != NULL)
+            temp = temp->next;
+        temp->next = newStudent;
+    }
+}
+
+void displayCountAndNames(Student *current)
 {
     if (current != NULL)
     {
-        displayCountAndNames(count - 1, current->next);
+        displayCountAndNames(current->next);
         printf("%s ", current->firstName);
     }
 }
 
-void displayCount(int groupNum, struct HashMap *map)
+void displayCount(int index, Student *hash_table[4])
 {
+    Student *temp = hash_table[index];
     int count = 0;
-    struct Student *current = map->list[groupNum];
 
-    while (current != NULL)
+    while (temp != NULL)
     {
         count++;
-        current = current->next;
+        temp = temp->next;
     }
 
     printf("%d ", count);
 
-    displayCountAndNames(count, map->list[groupNum]);
+    displayCountAndNames(hash_table[index]);
 }
 
-void displayStudentList(int groupNum, struct HashMap *map)
+void displayBranch(int index, Student *hash_table[4], char *branch)
 {
-    struct Student *current = map->list[groupNum];
+    Student *temp = hash_table[index];
+    int count = 0;
 
-    while (current != NULL)
+    while (temp != NULL)
     {
-        printf("%s ", current->firstName);
-        current = current->next;
+        if (!strcmp(branch, temp->branch))
+        {
+            printf("%s ", temp->firstName);
+            count++;
+        }
+        temp = temp->next;
     }
 
-    printf("\n");
+    if (count == 0)
+    {
+        printf("%d\n", -1);
+    }
+    else
+    {
+        printf("\n");
+    }
 }
 
 int main()
 {
-    int n;
+    char name[100];
+    char Roll_no[10];
+    char branch[3];
+    char option;
+    int index;
+
+    int n, age;
     scanf("%d", &n);
 
-    struct HashMap map;
-    initializeHashMap(&map);
+    Student *hash_table[4];
+    initializeHashMap(hash_table);
 
-    populateHashMap(&map, n);
+    int i = 0;
 
-    char branch[2];
-    char option;
+    while (i < n)
+    {
+        scanf("%s %s %d", name, Roll_no, &age);
+        strncpy(branch, &Roll_no[7], 2);
+        insert(hash_table, name, branch, age);
+        i++;
+    }
 
-    do
+    while (1)
     {
         scanf(" %c", &option);
+
         switch (option)
         {
         case 'c':
-            int k;
-            scanf("%d", &k);
-            displayCount(k, &map);
-            printf("\n");
-            break;
-
-        case '0':
-            scanf("%s", &branch);
-            displayBranchStudentList(0, branch, &map);
-            break;
-
-        case '1':
-            scanf("%s", &branch);
-            displayBranchStudentList(1, branch, &map);
-            break;
-
-        case '2':
-            scanf("%s", &branch);
-            displayBranchStudentList(2, branch, &map);
-            break;
-
-        case '3':
-            scanf("%s", &branch);
-            displayBranchStudentList(3, branch, &map);
-            break;
-
-        case 'e':
+        {
+            scanf(" %d", &index);
+            if (index >= 0 && index <= 3)
+            {
+                displayCount(index, hash_table);
+                printf("\n");
+            }
+            else
+                printf("-1\n");
             break;
         }
 
-    } while (option != 'e');
+        case '0':
+        {
+            scanf(" %s", branch);
+            convertToLowercase(branch);
+            displayBranch(0, hash_table, branch);
+            break;
+        }
 
-    return 0;
+        case '1':
+        {
+            scanf(" %s", branch);
+            convertToLowercase(branch);
+            displayBranch(1, hash_table, branch);
+            break;
+        }
+
+        case '2':
+        {
+            scanf(" %s", branch);
+            convertToLowercase(branch);
+            displayBranch(2, hash_table, branch);
+            break;
+        }
+
+        case '3':
+        {
+            scanf(" %s", branch);
+            convertToLowercase(branch);
+            displayBranch(3, hash_table, branch);
+            break;
+        }
+
+        case 'e':
+            return 0;
+        }
+    }
 }

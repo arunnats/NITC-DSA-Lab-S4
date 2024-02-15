@@ -134,7 +134,7 @@ struct Node *initializeNode(int x)
     return newNode;
 }
 
-int max(int a, int b)
+int maxValFunc(int a, int b)
 {
     if (a >= b)
         return a;
@@ -265,9 +265,9 @@ int diameter(struct Node *root, int *height)
     lDiam = diameter(root->l, &lh);
     rDiam = diameter(root->r, &rh);
 
-    *height = max(lh, rh) + 1;
+    *height = maxValFunc(lh, rh) + 1;
 
-    return max(lh + rh + 1, max(lDiam, rDiam));
+    return maxValFunc(lh + rh + 1, maxValFunc(lDiam, rDiam));
 }
 
 void levelMax(struct Node *root)
@@ -287,7 +287,7 @@ void levelMax(struct Node *root)
         for (int i = 0; i < levelSize; i++)
         {
             struct Node *temp = dequeue(q);
-            maxVal = max(maxVal, temp->key);
+            maxVal = maxValFunc(maxVal, temp->key);
 
             if (temp->l)
                 enqueue(temp->l, q);

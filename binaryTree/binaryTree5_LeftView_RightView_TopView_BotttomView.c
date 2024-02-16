@@ -64,7 +64,7 @@ struct treeNode* buildTree(int inorder[], int postorder[], int inStart, int inEn
   newNode->right = buildTree(inorder, postorder, inIndex+1, inEnd, postIndex);
   return newNode;
 }
-
+v
 
 int main()
 {

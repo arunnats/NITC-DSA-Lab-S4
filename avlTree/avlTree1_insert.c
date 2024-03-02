@@ -244,13 +244,13 @@ void printAncestors(struct Node *root, int key)
 
     if (key < root->key)
     {
-        printAncestors(root->l, key);
         printf("%d ", root->key);
+        printAncestors(root->l, key);
     }
     else if (key > root->key)
     {
-        printAncestors(root->r, key);
         printf("%d ", root->key);
+        printAncestors(root->r, key);
     }
     else
     {
@@ -258,22 +258,21 @@ void printAncestors(struct Node *root, int key)
     }
 }
 
-void search(struct Node *root, int key)
+void search(struct Node *root, int key, struct Node *ogRoot)
 {
     if (root == NULL)
     {
-        printf("-1");
+        printf("-1\n");
         return;
     }
 
     if (key < root->key)
-        search(root->l, key);
-
+        search(root->l, key, ogRoot);
     else if (key > root->key)
-        search(root->r, key);
+        search(root->r, key, ogRoot);
     else
     {
-        printAncestors(root, key);
+        printAncestors(ogRoot, key);
         printf("\n");
     }
 }
@@ -306,9 +305,15 @@ int main()
             printf("\n");
             break;
 
+        case 'd':
+            scanf(" %d", &x);
+            printAncestors(root, x);
+            printf("\n");
+            break;
+
         case 's':
             scanf(" %d", &x);
-            search(root, x);
+            search(root, x, root);
             break;
 
         case 't':

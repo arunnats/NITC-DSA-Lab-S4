@@ -277,6 +277,25 @@ void search(struct Node *root, int key, struct Node *ogRoot)
     }
 }
 
+void calculateRotations(struct Node *node, int *leftRotations, int *rightRotations)
+{
+    if (node == NULL)
+        return;
+
+    int leftSubtree = 0, rightSubtree = 0;
+    calculateRotations(node->l, &leftSubtree, &rightSubtree);
+
+    *leftRotations = leftSubtree + (node->height < 0 ? 1 : 0) + rightSubtree;
+    *rightRotations = rightSubtree + (node->height > 0 ? 1 : 0) + leftSubtree;
+}
+
+void calculate(struct Node *root)
+{
+    int leftRotations = 0, rightRotations = 0;
+    calculateRotations(root, &leftRotations, &rightRotations);
+    printf("%d %d", rightRotations, leftRotations);
+}
+
 int main()
 {
     struct Node *root = NULL;
@@ -305,9 +324,13 @@ int main()
             printf("\n");
             break;
 
+        case 'c':
+            printLevelOrder(root);
+            printf("\n");
+            break;
+
         case 'd':
-            scanf(" %d", &x);
-            printAncestors(root, x);
+            calculate(root);
             printf("\n");
             break;
 

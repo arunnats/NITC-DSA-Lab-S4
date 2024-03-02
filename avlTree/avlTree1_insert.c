@@ -237,6 +237,47 @@ struct Node *insertAVL(struct Node *root, int key)
     return root;
 }
 
+void printAncestors(struct Node *root, int key)
+{
+    if (root == NULL)
+        return;
+
+    if (key < root->key)
+    {
+        printAncestors(root->l, key);
+        printf("%d ", root->key);
+    }
+    else if (key > root->key)
+    {
+        printAncestors(root->r, key);
+        printf("%d ", root->key);
+    }
+    else
+    {
+        printf("%d ", root->key);
+    }
+}
+
+void search(struct Node *root, int key)
+{
+    if (root == NULL)
+    {
+        printf("-1");
+        return;
+    }
+
+    if (key < root->key)
+        search(root->l, key);
+
+    else if (key > root->key)
+        search(root->r, key);
+    else
+    {
+        printAncestors(root, key);
+        printf("\n");
+    }
+}
+
 int main()
 {
     struct Node *root = NULL;
@@ -263,6 +304,11 @@ int main()
         case 'l':
             printLevelOrder(root);
             printf("\n");
+            break;
+
+        case 's':
+            scanf(" %d", &x);
+            search(root, x);
             break;
 
         case 't':

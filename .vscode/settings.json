@@ -2,6 +2,7 @@
     "files.associations": {
         "*.ejs": "html",
         "typeinfo": "c",
-        "avltree2_orderedmap": "c"
+        "avltree2_orderedmap": "c",
+        "rbtree1_insert": "c"
     }
 }

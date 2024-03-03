@@ -244,7 +244,10 @@ struct Node *insertRB(struct Node *root, int key)
     struct Node *node = createNode(key);
 
     if (root == NULL)
+    {
+        node->color = BLACK;
         return node;
+    }
 
     struct Node *parent = NULL;
     struct Node *current = root;

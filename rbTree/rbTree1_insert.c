@@ -327,6 +327,20 @@ void printLevelOrder(struct Node *root)
     }
 }
 
+void printParenthesisRep(struct Node *node)
+{
+    if (node == NULL)
+    {
+        printf("( ) ");
+        return;
+    }
+
+    printf("(%d %c ", node->key, (node->color == RED) ? 'R' : 'B');
+    printParenthesisRep(node->l);
+    printParenthesisRep(node->r);
+    printf(") ");
+}
+
 int main()
 {
     struct Node *root = NULL;
@@ -352,6 +366,11 @@ int main()
 
         case 'l':
             printLevelOrder(root);
+            printf("\n");
+            break;
+
+        case 'b':
+            printParenthesisRep(root);
             printf("\n");
             break;
 

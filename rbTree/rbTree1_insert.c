@@ -7,7 +7,7 @@
 struct Node
 {
     int key;
-    int color;
+    int colour;
     struct Node *l;
     struct Node *r;
     struct Node *p;
@@ -144,7 +144,7 @@ struct Node *createNode(int key)
 {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->key = key;
-    newNode->color = RED;
+    newNode->colour = RED;
     newNode->l = NULL;
     newNode->r = NULL;
     newNode->p = NULL;
@@ -204,13 +204,13 @@ struct Node *findRoot(struct Node *node)
 
 void insertFixup(struct Node *root, struct Node *node)
 {
-    while (node->p != NULL && node->p->color == RED && node->p->p != NULL)
+    while (node->p != NULL && node->p->colour == RED && node->p->p != NULL)
     {
         if (node->p == node->p->p->l)
         {
             struct Node *uncle = node->p->p->r;
 
-            if (uncle != NULL && uncle->color == RED)
+            if (uncle != NULL && uncle->colour == RED)
                 fixupCase1(node);
             else
             {
@@ -224,7 +224,7 @@ void insertFixup(struct Node *root, struct Node *node)
         {
             struct Node *uncle = node->p->p->l;
 
-            if (uncle != NULL && uncle->color == RED)
+            if (uncle != NULL && uncle->colour == RED)
                 fixupCase1(node);
             else
             {
@@ -236,7 +236,7 @@ void insertFixup(struct Node *root, struct Node *node)
         }
     }
 
-    root->color = BLACK;
+    root->colour = BLACK;
 }
 
 struct Node *insertRB(struct Node *root, int key)
@@ -245,7 +245,7 @@ struct Node *insertRB(struct Node *root, int key)
 
     if (root == NULL)
     {
-        node->color = BLACK;
+        node->colour = BLACK;
         return node;
     }
 
@@ -279,8 +279,8 @@ struct Node *insertRB(struct Node *root, int key)
 
 void fixupCase1(struct Node *node)
 {
-    node->p->color = BLACK;
-    node->p->p->color = RED;
+    node->p->colour = BLACK;
+    node->p->p->colour = RED;
     node = node->p->p;
 }
 
@@ -292,8 +292,8 @@ void fixupCase2(struct Node *root, struct Node *node)
 
 void fixupCase3(struct Node *root, struct Node *node)
 {
-    node->p->color = BLACK;
-    node->p->p->color = RED;
+    node->p->colour = BLACK;
+    node->p->p->colour = RED;
     rightRotate(root, node->p->p);
 }
 
@@ -338,7 +338,7 @@ void printParenthesisRep(struct Node *node)
         return;
     }
 
-    printf("(%d %c ", node->key, (node->color == RED) ? 'R' : 'B');
+    printf("(%d %c ", node->key, (node->colour == RED) ? 'R' : 'B');
     printParenthesisRep(node->l);
     printParenthesisRep(node->r);
     printf(") ");

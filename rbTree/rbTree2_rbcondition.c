@@ -23,44 +23,114 @@ struct Node *initializeNode(int key, int color)
     return newNode;
 }
 
-struct Node *buildRBTree(char *expression, int start, int end)
+// struct Node *buildTree(char *expression)
+// {
+//     struct Node *root = NULL;
+//     struct Node *current = NULL;
+//     struct Node *queue[1001];
+//     int front = -1;
+//     int rear = -1;
+
+//     int pos = 0;
+//     while (expression[pos] != '\0')
+//     {
+//         int num = 0;
+//         while (expression[pos] != ' ' && expression[pos] != '\0')
+//         {
+//             num = num * 10 + (expression[pos] - '0');
+//             pos++;
+//         }
+
+//         char colorChar = expression[++pos];
+//         int color = (colorChar == 'B') ? BLACK : RED;
+
+//         struct Node *newNode = initializeNode(num, color);
+
+//         if (root == NULL)
+//         {
+//             root = newNode;
+//             current = root;
+//         }
+//         else
+//         {
+//             if (current->l == NULL)
+//             {
+//                 current->l = newNode;
+//             }
+//             else if (current->r == NULL)
+//             {
+//                 current->r = newNode;
+//             }
+
+//             if (current->l != NULL && current->r != NULL)
+//             {
+//                 front++;
+//                 current = queue[front];
+//             }
+//         }
+
+//         if (expression[++pos] == '(')
+//         {
+//             queue[++rear] = newNode;
+//             pos++;
+//         }
+//     }
+
+//     return root;
+// }
+
+struct Node *buildTree(char *expression, int *pos)
 {
-    if (start > end)
+    while (expression[*pos] == ' ')
+    {
+        (*pos)++;
+    }
+
+    if (expression[*pos] == '\0' || expression[*pos] == ')')
+    {
         return NULL;
+    }
 
+    // Read the numeric part
     int num = 0;
-    while (start <= end && expression[start] >= '0' && expression[start] <= '9')
+    while (expression[*pos] >= '0' && expression[*pos] <= '9')
     {
-        num *= 10;
-        num += (expression[start] - '0');
-        start++;
+        num = num * 10 + (expression[*pos] - '0');
+        (*pos)++;
     }
 
-    char color = expression[start + 1];
-
-    struct Node *root = initializeNode(num, (color == 'B') ? BLACK : RED);
-
-    int count = 0;
-    int index = -1;
-
-    for (int i = start; i <= end; i++)
+    while (expression[*pos] == ' ')
     {
-        if (expression[i] == '(')
-            count++;
-        else if (expression[i] == ')')
-            count--;
-
-        if (count == 0)
-        {
-            index = i;
-            break;
-        }
+        (*pos)++;
     }
 
-    if (index != -1)
+    char colorChar = expression[*pos];
+    int color = (colorChar == 'B') ? BLACK : RED;
+
+    struct Node *root = initializeNode(num, color);
+
+    (*pos)++;
+
+    if (expression[*pos] == '(')
     {
-        root->l = buildRBTree(expression, start + 3, index - 1);
-        root->r = buildRBTree(expression, index + 2, end - 1);
+        (*pos)++;
+
+        root->l = buildTree(expression, pos);
+
+        (*pos)++;
+
+        (*pos)++;
+    }
+
+    if (expression[*pos] == '(')
+    {
+        (*pos)++;
+
+        root->r = buildTree(expression, pos);
+
+        (*pos)++;
+
+        (*pos)++;
     }
 
     return root;
@@ -71,7 +141,7 @@ void inorderTraversal(struct Node *root)
     if (root != NULL)
     {
         inorderTraversal(root->l);
-        printf("%d %c", root->key);
+        printf("(%d %d)", root->key, root->color);
         inorderTraversal(root->r);
     }
 }
@@ -113,6 +183,18 @@ int checkRedblackTree(struct Node *root)
 
 int main()
 {
+    // char expression[1001];
+    // fgets(expression, sizeof(expression), stdin);
+    // size_t len = strlen(expression);
+
+    // if (len > 0 && expression[len - 1] == '\n')
+    // {
+    //     expression[len - 1] = '\0';
+    //     len--;
+    // }
+
+    // struct Node *root = buildTree(expression);
+
     char expression[1001];
     fgets(expression, sizeof(expression), stdin);
     size_t len = strlen(expression);
@@ -123,7 +205,8 @@ int main()
         len--;
     }
 
-    struct Node *root = buildRBTree(expression, 1, sizeof(expression) / sizeof(expression[0]) - 2);
+    int pos = 1;
+    struct Node *root = buildTree(expression, &pos);
 
     printf("In-order traversal of the constructed RB Tree:\n");
     inorderTraversal(root);

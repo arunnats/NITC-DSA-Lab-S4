@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.ejs": "html",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "avltree2_orderedmap": "c"
     }
 }

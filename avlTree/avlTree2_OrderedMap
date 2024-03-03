@@ -1,0 +1,125 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node
+{
+    int key;
+    int value;
+    int height;
+    struct Node *l;
+    struct Node *r;
+};
+
+struct Node *createNode(int key, int value)
+{
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->l = NULL;
+    newNode->r = NULL;
+    newNode->height = 1;
+    return newNode;
+}
+
+int height(struct Node *node)
+{
+    if (node == NULL)
+        return 0;
+    return node->height;
+}
+
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
+}
+
+struct Node *rightRotate(struct Node *y)
+{
+    struct Node *x = y->l;
+    struct Node *T2 = x->r;
+
+    x->r = y;
+    y->l = T2;
+
+    y->height = max(height(y->l), height(y->r)) + 1;
+    x->height = max(height(x->l), height(x->r)) + 1;
+
+    return x;
+}
+
+struct Node *leftRotate(struct Node *x)
+{
+    struct Node *y = x->r;
+    struct Node *T2 = y->l;
+
+    y->l = x;
+    x->r = T2;
+
+    x->height = max(height(x->l), height(x->r)) + 1;
+    y->height = max(height(y->l), height(y->r)) + 1;
+
+    return y;
+}
+
+int getBalance(struct Node *node)
+{
+    if (node == NULL)
+        return 0;
+    return height(node->l) - height(node->r);
+}
+
+struct Node *insert(struct Node *node, int key, int value)
+{
+    if (node == NULL)
+        return createNode(key, value);
+
+    if (key < node->key)
+        node->l = insert(node->l, key, value);
+    else if (key > node->key)
+        node->r = insert(node->r, key, value);
+    else
+    {
+        node->value = value;
+        return node;
+    }
+
+    node->height = 1 + max(height(node->l), height(node->r));
+
+    int balance = getBalance(node);
+
+    if (balance > 1 && key < node->l->key)
+        return rightRotate(node);
+
+    if (balance < -1 && key > node->r->key)
+        return leftRotate(node);
+
+    if (balance > 1 && key > node->l->key)
+    {
+        node->l = leftRotate(node->l);
+        return rightRotate(node);
+    }
+
+    if (balance < -1 && key < node->r->key)
+    {
+        node->r = rightRotate(node->r);
+        return leftRotate(node);
+    }
+
+    return node;
+}
+
+struct AVLNode *lowerBound(struct AVLNode *node, int key)
+{
+    if (node == NULL)
+        return NULL;
+
+    if (key == node->key)
+        return node;
+
+    if (key < node->key)
+        return lowerBound(node->left, key);
+
+    struct AVLNode *rightLB = lowerBound(node->right, key);
+
+    return (rightLB != NULL) ? rightLB : node;
+}

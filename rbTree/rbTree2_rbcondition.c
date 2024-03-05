@@ -118,10 +118,12 @@ struct Node *buildTree(char ch[], int *i)
                 (*i) += 2;
             }
             root = initializeNode(key, c);
-            root->l = initializeNode(ch, i);
-            root->r = initializeNode(ch, i);
-            while (ch[*i] != ')')
-                (*i)++;
+            (*i)++;
+            root->l = buildTree(ch, i);
+            (*i)++;
+            root->r = buildTree(ch, i);
+            (*i)++;
+            return root;
         }
         else if (ch[*i] == ')')
         {

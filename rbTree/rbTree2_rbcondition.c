@@ -79,62 +79,112 @@ struct Node *initializeNode(int key, int color)
 //     return root;
 // }
 
-struct Node *buildTree(char *expression, int *pos)
+struct Node *buildTree(char ch[], int *i)
 {
-    while (expression[*pos] == ' ')
+    int key = 0;
+    int c = 0;
+    struct Node *root = NULL;
+    while (ch[*i] != '\0')
     {
-        (*pos)++;
+        if (ch[*i] == '(')
+        {
+            (*i) += 2;
+            if (ch[*i] == ')')
+            {
+                (*i)++;
+                return NULL;
+            }
+            int s = 1;
+            if (ch[*i] == '-')
+            {
+                s = -1;
+                (*i)++;
+            }
+            while (ch[*i] >= '0' && ch[*i] <= '9')
+            {
+                key = key * 10 + (int)(ch[*i] - '0');
+                (*i)++;
+            }
+            key *= s;
+            (*i)++;
+            if (ch[*i] == 'R' || ch[*i] == 'r')
+            {
+                c = 0;
+                (*i) += 2;
+            }
+            if (ch[*i] == 'B' || ch[*i] == 'b')
+            {
+                c = 1;
+                (*i) += 2;
+            }
+            root = initializeNode(key, c);
+            root->l = initializeNode(ch, i);
+            root->r = initializeNode(ch, i);
+            while (ch[*i] != ')')
+                (*i)++;
+        }
+        else if (ch[*i] == ')')
+        {
+            (*i)++;
+            return root;
+        }
+        else
+            (*i)++;
     }
-
-    if (expression[*pos] == '\0' || expression[*pos] == ')')
-    {
-        return NULL;
-    }
-
-    // Read the numeric part
-    int num = 0;
-    while (expression[*pos] >= '0' && expression[*pos] <= '9')
-    {
-        num = num * 10 + (expression[*pos] - '0');
-        (*pos)++;
-    }
-
-    while (expression[*pos] == ' ')
-    {
-        (*pos)++;
-    }
-
-    char colorChar = expression[*pos];
-    int color = (colorChar == 'B') ? BLACK : RED;
-
-    struct Node *root = initializeNode(num, color);
-
-    (*pos)++;
-
-    if (expression[*pos] == '(')
-    {
-        (*pos)++;
-
-        root->l = buildTree(expression, pos);
-
-        (*pos)++;
-
-        (*pos)++;
-    }
-
-    if (expression[*pos] == '(')
-    {
-        (*pos)++;
-
-        root->r = buildTree(expression, pos);
-
-        (*pos)++;
-
-        (*pos)++;
-    }
-
     return root;
 }
+
+// struct Node *buildTree(char *expression, int *pos)
+// {
+//     while (expression[*pos] == ' ')
+//     {
+//         (*pos)++;
+//     }
+
+//     if (expression[*pos] == '\0' || expression[*pos] == ')')
+//     {
+//         return NULL;
+//     }
+
+//     int num = 0;
+//     while (expression[*pos] >= '0' && expression[*pos] <= '9')
+//     {
+//         num = num * 10 + (expression[*pos] - '0');
+//         (*pos)++;
+//     }
+
+//     while (expression[*pos] == ' ')
+//     {
+//         (*pos)++;
+//     }
+
+//     char colorChar = expression[*pos];
+//     int color = (colorChar == 'B') ? BLACK : RED;
+
+//     struct Node *root = initializeNode(num, color);
+
+//     (*pos)++;
+
+//     if (expression[*pos] == '(')
+//     {
+//         (*pos)++;
+
+//         root->l = buildTree(expression, pos);
+
+//         (*pos)++;
+//     }
+
+//     if (expression[*pos] == '(')
+//     {
+//         (*pos)++;
+
+//         root->r = buildTree(expression, pos);
+
+//         (*pos)++;
+//     }
+
+//     return root;
+// }
 
 void inorderTraversal(struct Node *root)
 {

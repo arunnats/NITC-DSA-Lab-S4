@@ -76,15 +76,15 @@ struct Node *leftRotate(struct Node *x)
     return y;
 }
 
-struct Node *insertAVL(struct Node *root, int key)
+struct Node *insertAVL(struct Node *root, int key, int *leftRot, int *rightRot)
 {
     if (root == NULL)
         return initializeNode(key);
 
     if (key < root->key)
-        root->l = insertAVL(root->l, key);
+        root->l = insertAVL(root->l, key, leftRot, rightRot);
     else if (key > root->key)
-        root->r = insertAVL(root->r, key);
+        root->r = insertAVL(root->r, key, leftRot, rightRot);
     else
         return root;
 
@@ -93,20 +93,28 @@ struct Node *insertAVL(struct Node *root, int key)
     int balance = getBalance(root);
 
     if (balance > 1 && key < root->l->key)
+    {
+        (*rightRot)++;
         return rightRotate(root);
+    }
 
     if (balance < -1 && key > root->r->key)
+    {
+        (*leftRot)++;
         return leftRotate(root);
+    }
 
     if (balance > 1 && key > root->l->key)
     {
         root->l = leftRotate(root->l);
+        (*leftRot)++;
         return rightRotate(root);
     }
 
     if (balance < -1 && key < root->r->key)
     {
         root->r = rightRotate(root->r);
+        (*rightRot)++;
         return leftRotate(root);
     }
 
@@ -153,23 +161,9 @@ void search(struct Node *root, int key, struct Node *ogRoot)
     }
 }
 
-void calculateRotations(struct Node *node, int *leftRotations, int *rightRotations)
+void calculate(int leftRot, int rightRot)
 {
-    if (node == NULL)
-        return;
-
-    int leftSubtree = 0, rightSubtree = 0;
-    calculateRotations(node->l, &leftSubtree, &rightSubtree);
-
-    *leftRotations = leftSubtree + (node->height < 0 ? 1 : 0) + rightSubtree;
-    *rightRotations = rightSubtree + (node->height > 0 ? 1 : 0) + leftSubtree;
-}
-
-void calculate(struct Node *root)
-{
-    int leftRotations = 0, rightRotations = 0;
-    calculateRotations(root, &leftRotations, &rightRotations);
-    printf("%d %d", rightRotations, leftRotations);
+    printf("%d %d", leftRot, rightRot);
 }
 
 int main()
@@ -178,6 +172,7 @@ int main()
 
     char choice;
     int x;
+    int leftRot = 0, rightRot = 0;
 
     do
     {
@@ -187,7 +182,7 @@ int main()
         {
         case 'i':
             scanf(" %d", &x);
-            root = insertAVL(root, x);
+            root = insertAVL(root, x, &leftRot, &rightRot);
             break;
 
         case 'p':
@@ -196,7 +191,7 @@ int main()
             break;
 
         case 's':
-            calculate(root);
+            calculate(leftRot, rightRot);
             printf("\n");
             break;
 
@@ -214,5 +209,5 @@ int main()
 
     } while (choice != 'e');
 
-    return 0;
+    return 1;
 }

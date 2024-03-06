@@ -125,17 +125,17 @@ struct Node *dequeue(struct Queue *Q);
 
 struct Node *createNode(int key);
 
-void leftRotate(struct Node *root, struct Node *x);
-void rightRotate(struct Node *root, struct Node *y);
+void leftRotate(struct Node **root, struct Node *x);
+void rightRotate(struct Node **root, struct Node *y);
 
 struct Node *findRoot(struct Node *node);
 
-void insertFixup(struct Node *root, struct Node *node);
+void insertFixup(struct Node **root, struct Node *node);
 struct Node *insertRB(struct Node *root, int key);
 
 void fixupCase1(struct Node *node);
-void fixupCase2(struct Node *root, struct Node *node);
-void fixupCase3(struct Node *root, struct Node *node);
+void fixupCase2(struct Node **root, struct Node *node);
+void fixupCase3(struct Node **root, struct Node *node);
 
 void inorderTraversal(struct Node *root);
 void printLevelOrder(struct Node *root);
@@ -151,7 +151,7 @@ struct Node *createNode(int key)
     return newNode;
 }
 
-void leftRotate(struct Node *root, struct Node *x)
+void leftRotate(struct Node **root, struct Node *x)
 {
     struct Node *y = x->r;
     x->r = y->l;
@@ -162,7 +162,7 @@ void leftRotate(struct Node *root, struct Node *x)
     y->p = x->p;
 
     if (x->p == NULL)
-        root = y;
+        *root = y;
     else if (x == x->p->l)
         x->p->l = y;
     else
@@ -172,7 +172,7 @@ void leftRotate(struct Node *root, struct Node *x)
     x->p = y;
 }
 
-void rightRotate(struct Node *root, struct Node *y)
+void rightRotate(struct Node **root, struct Node *y)
 {
     struct Node *x = y->l;
     y->l = x->r;
@@ -183,7 +183,7 @@ void rightRotate(struct Node *root, struct Node *y)
     x->p = y->p;
 
     if (y->p == NULL)
-        root = x;
+        *root = x;
     else if (y == y->p->l)
         y->p->l = x;
     else
@@ -202,7 +202,7 @@ struct Node *findRoot(struct Node *node)
     return node;
 }
 
-void insertFixup(struct Node *root, struct Node *node)
+void insertFixup(struct Node **root, struct Node *node)
 {
     while (node->p != NULL && node->p->colour == RED && node->p->p != NULL)
     {
@@ -236,7 +236,7 @@ void insertFixup(struct Node *root, struct Node *node)
         }
     }
 
-    root->colour = BLACK;
+    (*root)->colour = BLACK;
 }
 
 struct Node *insertRB(struct Node *root, int key)
@@ -272,7 +272,7 @@ struct Node *insertRB(struct Node *root, int key)
     else
         parent->r = node;
 
-    insertFixup(root, node);
+    insertFixup(&root, node);
 
     return findRoot(node);
 }
@@ -284,13 +284,13 @@ void fixupCase1(struct Node *node)
     node = node->p->p;
 }
 
-void fixupCase2(struct Node *root, struct Node *node)
+void fixupCase2(struct Node **root, struct Node *node)
 {
     node = node->p;
     leftRotate(root, node);
 }
 
-void fixupCase3(struct Node *root, struct Node *node)
+void fixupCase3(struct Node **root, struct Node *node)
 {
     node->p->colour = BLACK;
     node->p->p->colour = RED;

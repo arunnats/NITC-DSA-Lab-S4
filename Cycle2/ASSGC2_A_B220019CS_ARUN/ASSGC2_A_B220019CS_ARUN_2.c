@@ -218,5 +218,5 @@ int main()
 
     } while (choice != 't');
 
-    return 0;
+    return 1;
 }

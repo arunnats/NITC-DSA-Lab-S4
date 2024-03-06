@@ -1,185 +1,148 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define RED 0
-#define BLACK 1
-
 struct Node
 {
     int key;
     int colour;
-    struct Node *l;
-    struct Node *r;
-    struct Node *p;
+    struct Node *left;
+    struct Node *right;
+    struct Node *parent;
 };
 
-void leftRotate(struct Node *root, struct Node *x);
-void rightRotate(struct Node *root, struct Node *y);
-
-struct Node *findRoot(struct Node *node);
-
-void insertFixup(struct Node *root, struct Node *node);
-struct Node *insertRB(struct Node *root, int key);
-
-void fixupCase1(struct Node *node);
-void fixupCase2(struct Node *root, struct Node *node);
-void fixupCase3(struct Node *root, struct Node *node);
-
-struct Node *createNode(int key)
+struct Node *createNode(int key, int colour, struct Node *parent)
 {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->key = key;
-    newNode->colour = RED;
-    newNode->l = NULL;
-    newNode->r = NULL;
-    newNode->p = NULL;
+    newNode->colour = colour;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    newNode->parent = parent;
     return newNode;
 }
 
-void leftRotate(struct Node *root, struct Node *x)
+void leftRotate(struct Node **root, struct Node *x)
 {
-    struct Node *y = x->r;
-    x->r = y->l;
+    struct Node *y = x->right;
+    x->right = y->left;
 
-    if (y->l != NULL)
-        y->l->p = x;
+    if (y->left != NULL)
+        y->left->parent = x;
 
-    y->p = x->p;
+    y->parent = x->parent;
 
-    if (x->p == NULL)
-        root = y;
-    else if (x == x->p->l)
-        x->p->l = y;
+    if (x->parent == NULL)
+        *root = y;
+    else if (x == x->parent->left)
+        x->parent->left = y;
     else
-        x->p->r = y;
+        x->parent->right = y;
 
-    y->l = x;
-    x->p = y;
+    y->left = x;
+    x->parent = y;
 }
 
-void rightRotate(struct Node *root, struct Node *y)
+void rightRotate(struct Node **root, struct Node *y)
 {
-    struct Node *x = y->l;
-    y->l = x->r;
+    struct Node *x = y->left;
+    y->left = x->right;
 
-    if (x->r != NULL)
-        x->r->p = y;
+    if (x->right != NULL)
+        x->right->parent = y;
 
-    x->p = y->p;
+    x->parent = y->parent;
 
-    if (y->p == NULL)
-        root = x;
-    else if (y == y->p->l)
-        y->p->l = x;
+    if (y->parent == NULL)
+        *root = x;
+    else if (y == y->parent->left)
+        y->parent->left = x;
     else
-        y->p->r = x;
+        y->parent->right = x;
 
-    x->r = y;
-    y->p = x;
+    x->right = y;
+    y->parent = x;
 }
 
-struct Node *findRoot(struct Node *node)
+void fixCase1(struct Node **root, struct Node *node)
 {
-    while (node->p != NULL)
-    {
-        node = node->p;
-    }
-    return node;
+    node->parent->colour = 1;
+    node->parent->parent->colour = 0;
+    node = node->parent->parent;
 }
 
-void insertFixup(struct Node *root, struct Node *node)
+void fixCase2(struct Node **root, struct Node *node)
 {
-    while (node->p != NULL && node->p->colour == RED && node->p->p != NULL)
-    {
-        if (node->p == node->p->p->l)
-        {
-            struct Node *uncle = node->p->p->r;
-
-            if (uncle != NULL && uncle->colour == RED)
-                fixupCase1(node);
-            else
-            {
-                if (node == node->p->r)
-                    fixupCase2(root, node);
-                else
-                    fixupCase3(root, node);
-            }
-        }
-        else
-        {
-            struct Node *uncle = node->p->p->l;
-
-            if (uncle != NULL && uncle->colour == RED)
-                fixupCase1(node);
-            else
-            {
-                if (node == node->p->l)
-                    fixupCase2(root, node);
-                else
-                    fixupCase3(root, node);
-            }
-        }
-    }
-
-    root->colour = BLACK;
-}
-
-struct Node *insertRB(struct Node *root, int key)
-{
-    struct Node *node = createNode(key);
-
-    if (root == NULL)
-    {
-        node->colour = BLACK;
-        return node;
-    }
-
-    struct Node *parent = NULL;
-    struct Node *current = root;
-
-    while (current != NULL)
-    {
-        parent = current;
-        if (key < current->key)
-            current = current->l;
-        else if (key > current->key)
-            current = current->r;
-        else
-        {
-            free(node);
-            return root;
-        }
-    }
-
-    node->p = parent;
-    if (key < parent->key)
-        parent->l = node;
-    else
-        parent->r = node;
-
-    insertFixup(root, node);
-
-    return findRoot(node);
-}
-
-void fixupCase1(struct Node *node)
-{
-    node->p->colour = BLACK;
-    node->p->p->colour = RED;
-    node = node->p->p;
-}
-
-void fixupCase2(struct Node *root, struct Node *node)
-{
-    node = node->p;
+    node = node->parent;
     leftRotate(root, node);
 }
 
-void fixupCase3(struct Node *root, struct Node *node)
+void fixCase3(struct Node **root, struct Node *node)
 {
-    node->p->colour = BLACK;
-    node->p->p->colour = RED;
-    rightRotate(root, node->p->p);
+    node->parent->colour = 1;
+    node->parent->parent->colour = 0;
+    rightRotate(root, node->parent->parent);
+}
+
+void fix(struct Node **root, struct Node *z)
+{
+    while (z != *root && z->parent->colour == 0)
+    {
+        if (z->parent == z->parent->parent->left)
+        {
+            struct Node *x = z->parent->parent->right;
+            if (x != NULL && x->colour == 0)
+                fixCase1(root, z);
+            else
+            {
+                if (z == z->parent->right)
+                    fixCase2(root, z);
+                else
+                    fixCase3(root, z);
+            }
+        }
+        else
+        {
+            struct Node *x = z->parent->parent->left;
+            if (x != NULL && x->colour == 0)
+                fixCase1(root, z);
+            else
+            {
+                if (z == z->parent->left)
+                    fixCase2(root, z);
+                else
+                    fixCase3(root, z);
+            }
+        }
+    }
+    (*root)->colour = 1;
+}
+
+void insert(struct Node **root, int num)
+{
+    struct Node *z = createNode(num, 0, NULL);
+    struct Node *x = *root;
+    struct Node *y = NULL;
+    while (x != NULL)
+    {
+        y = x;
+        if (x->key > z->key)
+            x = x->left;
+        else
+            x = x->right;
+    }
+    z->parent = y;
+    if (y == NULL)
+    {
+        *root = z;
+    }
+    else
+    {
+        if (y->key > z->key)
+            y->left = z;
+        else
+            y->right = z;
+    }
+    fix(root, z);
 }
 
 void printParenthesisRep(struct Node *node)
@@ -190,9 +153,9 @@ void printParenthesisRep(struct Node *node)
         return;
     }
 
-    printf("(%d %c ", node->key, (node->colour == RED) ? 'R' : 'B');
-    printParenthesisRep(node->l);
-    printParenthesisRep(node->r);
+    printf("(%d %c ", node->key, (node->colour == 0) ? 'R' : 'B');
+    printParenthesisRep(node->left);
+    printParenthesisRep(node->right);
     printf(") ");
 }
 
@@ -211,11 +174,10 @@ int main()
             x = x * 10 + (int)(ch[i] - '0');
             i++;
         }
-        root = insertRB(root, x);
+        insert(&root, x);
         printParenthesisRep(root);
         printf("\n");
     }
-    return 0;
 
-    return 0;
+    return 1;
 }

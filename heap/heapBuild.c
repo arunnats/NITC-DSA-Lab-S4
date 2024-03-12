@@ -72,7 +72,7 @@ int findMin(int arr[])
 int extractMin(int arr[], int heapSize)
 {
     if (heapSize <= 0)
-        return -1; // Heap is empty
+        return -1;
 
     int min = arr[0];
     arr[0] = arr[heapSize - 1];

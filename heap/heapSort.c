@@ -41,6 +41,20 @@ void maxHeapify(int arr[], int heapSize, int i)
 
 void buildHeap(int arr[], int heapSize)
 {
+    for (int i = heapSize / 2 - 1; i >= 0; i--)
+        maxHeapify(arr, heapSize, i);
+}
+
+void heapSort(int arr[], int heapSize)
+{
+    buildHeap(arr, heapSize);
+
+    for (int i = heapSize - 1; i > 0; i--)
+    {
+        swap(arr[0], arr[i]);
+
+        maxHeapify(arr, i, 0);
+    }
 }
 
 void main()
@@ -58,4 +72,11 @@ void main()
     {
         scanf("%d", &arr[i]);
     }
+
+    heapSort(arr, N);
+
+    printf("\n");
+
+    for (int i = 0; i < N; i++)
+        printf("%d ", arr[i]);
 }

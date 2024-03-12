@@ -47,6 +47,9 @@ void buildHeap(int arr[], int heapSize)
 
 void print(int arr[], int heapSize);
 {
+    for (int i = 0; i < heapSize; i++)
+        printf("%d ", arr[i]);
+    printf("\n", );
 }
 
 int main()
@@ -55,7 +58,7 @@ int main()
     int heapSize = 0;
 
     char choice;
-    int k;
+    int key, newKey;
 
     do
     {
@@ -63,7 +66,8 @@ int main()
 
         if (choice == 'i')
         {
-            heapSize = insertHeap(arr, heapSize);
+            scanf(" %d", &key);
+            heapSize = insertHeap(arr, heapSize, key);
         }
         else if (choice == 'm')
         {
@@ -77,7 +81,8 @@ int main()
         }
         else if (choice == 'u')
         {
-            updatePriority
+            scanf(" %d %d", &key, &newKey);
+            updatePriority(arr, heapSize, key, newKey);
         }
         else if (choice == 'p')
         {

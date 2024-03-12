@@ -22,27 +22,30 @@ void swap(int *a, int *b)
     *b = t;
 }
 
-void maxHeapify(int arr[], int heapSize, int i)
+void minHeapify(int arr[], int heapSize, int i)
 {
     int l = left(i);
     int r = right(i);
 
-    int max = i;
+    int min = i;
 
-    if (l < heapSize && arr[l] > arr[max])
-        max = l;
+    if (l < heapSize && arr[l] < arr[min])
+        min = l;
 
-    if (r < heapSize && arr[r] > arr[max])
-        max = r;
+    if (r < heapSize && arr[r] < arr[min])
+        min = r;
 
-    if (max != i)
-        swap(&arr[i], &arr[max]);
+    if (min != i)
+    {
+        swap(&arr[i], &arr[min]);
+        minHeapify(arr, heapSize, min);
+    }
 }
 
-void buildHeap(int arr[], int heapSize)
+void buildMinHeap(int arr[], int heapSize)
 {
     for (int i = heapSize / 2 - 1; i >= 0; i--)
-        maxHeapify(arr, heapSize, i);
+        minHeapify(arr, heapSize, i);
 }
 
 void print(int arr[], int heapSize)
@@ -52,12 +55,12 @@ void print(int arr[], int heapSize)
     printf("\n");
 }
 
-int insertHeap(int arr[], int heapSize, int key)
+int insertMinHeap(int arr[], int heapSize, int key)
 {
     arr[heapSize] = key;
-    buildHeap(arr, heapSize);
-
     heapSize++;
+    buildMinHeap(arr, heapSize);
+
     return heapSize;
 }
 
@@ -68,12 +71,15 @@ int findMin(int arr[])
 
 int extractMin(int arr[], int heapSize)
 {
-    swap(&arr[0], &arr[heapSize - 1]);
+    if (heapSize <= 0)
+        return -1; // Heap is empty
+
+    int min = arr[0];
+    arr[0] = arr[heapSize - 1];
     heapSize--;
 
-    buildHeap(arr, heapSize);
+    minHeapify(arr, heapSize, 0);
 
-    int min = findMin(arr);
     return min;
 }
 
@@ -83,7 +89,7 @@ int main()
     int heapSize = 0;
 
     char choice;
-    int key, newKey;
+    int key;
 
     do
     {
@@ -92,22 +98,20 @@ int main()
         if (choice == 'i')
         {
             scanf(" %d", &key);
-            heapSize = insertHeap(arr, heapSize, key);
+            heapSize = insertMinHeap(arr, heapSize, key);
         }
         else if (choice == 'm')
         {
             int min = findMin(arr);
-            printf("Minimum is %d", min);
+            printf("Minimum is %d\n", min);
         }
         else if (choice == 'e')
         {
-            int min = extractMin(arr);
-            printf("Minimum is %d \n", min);
-        }
-        else if (choice == 'u')
-        {
-            scanf(" %d %d", &key, &newKey);
-            updatePriority(arr, heapSize, key, newKey);
+            int min = extractMin(arr, heapSize);
+            if (min != -1)
+                printf("Minimum is %d\n", min);
+            else
+                printf("Heap is empty.\n");
         }
         else if (choice == 'p')
         {

@@ -2,17 +2,17 @@
 
 int left(int i)
 {
-    return i * 2;
+    return i * 2 + 1;
 }
 
 int right(int i)
 {
-    return (i * 2) + 1;
+    return (i * 2) + 2;
 }
 
 int parent(int i)
 {
-    return i / 2;
+    return (i - 1) / 2;
 }
 
 void swap(int *a, int *b)
@@ -29,11 +29,11 @@ void maxHeapify(int arr[], int heapSize, int i)
 
     int max = i;
 
-    if (l < heapSize && arr[i] > arr[l])
-        max = arr[l];
+    if (l < heapSize && arr[l] > arr[max])
+        max = l;
 
     if (r < heapSize && arr[r] > arr[max])
-        max = arr[r];
+        max = r;
 
     if (max != i)
         swap(&arr[i], &arr[max]);
@@ -51,20 +51,20 @@ void heapSort(int arr[], int heapSize)
 
     for (int i = heapSize - 1; i > 0; i--)
     {
-        swap(arr[0], arr[i]);
+        swap(&arr[0], &arr[i]);
 
         maxHeapify(arr, i, 0);
     }
 }
 
-void main()
+int main()
 {
     int N;
 
-    printf("Enter N ");
+    printf("Enter N: ");
     scanf("%d", &N);
 
-    printf("Enter %d elements", N);
+    printf("Enter %d elements: ", N);
 
     int arr[N];
 
@@ -75,8 +75,9 @@ void main()
 
     heapSort(arr, N);
 
-    printf("\n");
-
+    printf("\nSorted Array: ");
     for (int i = 0; i < N; i++)
         printf("%d ", arr[i]);
+
+    return 0;
 }

@@ -45,11 +45,36 @@ void buildHeap(int arr[], int heapSize)
         maxHeapify(arr, heapSize, i);
 }
 
-void print(int arr[], int heapSize);
+void print(int arr[], int heapSize)
 {
     for (int i = 0; i < heapSize; i++)
         printf("%d ", arr[i]);
-    printf("\n", );
+    printf("\n");
+}
+
+int insertHeap(int arr[], int heapSize, int key)
+{
+    arr[heapSize] = key;
+    buildHeap(arr, heapSize);
+
+    heapSize++;
+    return heapSize;
+}
+
+int findMin(int arr[])
+{
+    return arr[0];
+}
+
+int extractMin(int arr[], int heapSize)
+{
+    swap(&arr[0], &arr[heapSize - 1]);
+    heapSize--;
+
+    buildHeap(arr, heapSize);
+
+    int min = findMin(arr);
+    return min;
 }
 
 int main()

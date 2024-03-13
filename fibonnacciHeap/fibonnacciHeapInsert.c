@@ -106,3 +106,21 @@ struct FibonacciHeap *unionHeap(struct FibonacciHeap *fibHeap1, struct Fibonacci
 
     return newHeap;
 }
+
+void printRootList(struct Node *min)
+{
+    if (min == NULL)
+    {
+        printf("Empty heap\n");
+        return;
+    }
+
+    struct Node *current = min;
+    do
+    {
+        printf("%d ", current->key);
+        current = current->right;
+    } while (current != min);
+
+    printf("\n");
+}

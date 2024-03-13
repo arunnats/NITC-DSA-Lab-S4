@@ -75,10 +75,34 @@ struct FibonacciHeap *unionHeap(struct FibonacciHeap *fibHeap1, struct Fibonacci
 {
     struct FibonacciHeap *newHeap = createFibonacciHeap();
 
-    if (fibHeap1->min->key < fibHeap2->min->key)
+    if (fibHeap1->min == NULL)
+    {
+        newHeap->min = fibHeap2->min;
+    }
+    else if (fibHeap2->min == NULL)
     {
         newHeap->min = fibHeap1->min;
     }
     else
-        newHeap->min = fibHeap2->min;
+    {
+        newHeap->min->right = fibHeap1->min;
+        fibHeap1->min->left = newHeap->min;
+        fibHeap2->min->left->right = fibHeap1->min->right;
+        fibHeap1->min->right->left = fibHeap2->min->left;
+        fibHeap1->min->right = fibHeap2->min;
+        fibHeap2->min->left = fibHeap1->min;
+
+        if (fibHeap1->min->key < fibHeap2->min->key)
+        {
+            newHeap->min = fibHeap1->min;
+        }
+        else
+        {
+            newHeap->min = fibHeap2->min;
+        }
+    }
+
+    newHeap->N = fibHeap1->N + fibHeap2->N;
+
+    return newHeap;
 }

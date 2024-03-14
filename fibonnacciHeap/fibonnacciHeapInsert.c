@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 struct Node
 {
@@ -125,6 +126,24 @@ void printRootList(struct Node *min)
     printf("\n");
 }
 
+void printRootListWithDeg(struct Node *min)
+{
+    if (min == NULL)
+    {
+        printf("Empty heap\n");
+        return;
+    }
+
+    struct Node *current = min;
+    do
+    {
+        printf("%d (%d)", current->key, current->degree);
+        current = current->right;
+    } while (current != min);
+
+    printf("\n");
+}
+
 struct FibonacciHeap *removeFromRootList(struct FibonacciHeap *fibHeap, struct Node *min)
 {
     if (min->right == min)
@@ -156,6 +175,36 @@ struct FibonacciHeap *mergeChildrenWithRootList(struct FibonacciHeap *fibHeap, s
         } while (child != min->child);
     }
     return fibHeap;
+}
+
+void heap_link(struct Node *y, struct Node *x)
+{
+    if (y->right != y)
+    {
+        y->left->right = y->right;
+        y->right->left = y->left;
+    }
+    else
+    {
+        x->child = NULL;
+    }
+
+    y->parent = x;
+    if (x->child == NULL)
+    {
+        x->child = y;
+        y->left = y->right = y;
+    }
+    else
+    {
+        y->right = x->child->right;
+        y->left = x->child;
+        x->child->right->left = y;
+        x->child->right = y;
+    }
+    x->degree++;
+
+    y->marked = 0;
 }
 
 struct FibonacciHeap *consolidate(struct FibonacciHeap *fibHeap)
@@ -217,6 +266,27 @@ struct FibonacciHeap *consolidate(struct FibonacciHeap *fibHeap)
     return fibHeap;
 }
 
+struct Node *findMin(struct Node *min)
+{
+    if (min == NULL)
+    {
+        return NULL;
+    }
+
+    struct Node *current = min;
+    struct Node *minNode = min;
+    do
+    {
+        if (current->key < minNode->key)
+        {
+            minNode = current;
+        }
+        current = current->right;
+    } while (current != min);
+
+    return minNode;
+}
+
 struct Node *extractMin(struct FibonacciHeap *fibHeap)
 {
     struct Node *min = fibHeap->min;
@@ -227,14 +297,19 @@ struct Node *extractMin(struct FibonacciHeap *fibHeap)
         fibHeap = mergeChildrenWithRootList(fibHeap, min);
         fibHeap = consolidate(fibHeap);
 
+        fibHeap->min = findMin(fibHeap->min);
+
         return min;
     }
+
+    return NULL;
 }
 
 int main()
 {
     char choice;
     int key;
+    struct FibonacciHeap *fibHeap = createFibonacciHeap();
 
     do
     {
@@ -242,19 +317,36 @@ int main()
 
         if (choice == 'i')
         {
-        }
-        else if (choice == 'm')
-        {
-        }
-        else if (choice == 'e')
-        {
+            scanf("%d", &key);
+            fibHeap = insert(fibHeap, key);
         }
         else if (choice == 'p')
         {
+            printRootList(fibHeap->min);
+        }
+        else if (choice == 'd')
+        {
+            printRootListWithDeg(fibHeap->min);
+        }
+        else if (choice == 'e')
+        {
+            struct Node *min = extractMin(fibHeap);
+            if (min != NULL)
+            {
+                printf("Minimum key : %d\n", min->key);
+                free(min);
+            }
+            else
+            {
+                printf("The heap is empty.\n");
+            }
         }
         else if (choice == 't')
         {
             break;
+        }
+        else
+        {
         }
     } while (1);
 

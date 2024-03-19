@@ -121,7 +121,6 @@ void sizeOfComponents(struct Graph *graph)
         }
     }
 
-    // Print the sizes of connected components in increasing order
     printf("Sizes of connected components in the graph:\n");
     for (int i = 0; i < count; ++i)
     {

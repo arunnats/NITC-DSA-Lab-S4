@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define MAX_NODES 1000
 
@@ -61,6 +62,53 @@ void printGraph(struct Graph *graph)
     }
 }
 
+// DFS function to check if the graph contains a cycle
+bool isCyclicUtil(struct Graph *graph, int v, bool visited[], bool *recStack)
+{
+    if (visited[v] == false)
+    {
+        // Mark the current node as visited and part of recursion stack
+        visited[v] = true;
+        recStack[v] = true;
+
+        // Recur for all the vertices adjacent to this vertex
+        struct Node *temp = graph->array[v].head;
+        while (temp)
+        {
+            int adj = temp->destination;
+            if (!visited[adj] && isCyclicUtil(graph, adj, visited, recStack))
+                return true;
+            else if (recStack[adj])
+                return true;
+            temp = temp->next;
+        }
+    }
+
+    // Remove the vertex from recursion stack
+    recStack[v] = false;
+    return false;
+}
+
+// Function to check if the graph contains a cycle
+bool isCyclic(struct Graph *graph)
+{
+    // Mark all the vertices as not visited and not part of recursion stack
+    bool *visited = (bool *)malloc(graph->V * sizeof(bool));
+    bool *recStack = (bool *)malloc(graph->V * sizeof(bool));
+    for (int i = 0; i < graph->V; i++)
+    {
+        visited[i] = false;
+        recStack[i] = false;
+    }
+
+    // Call the recursive helper function to detect cycle in different DFS trees
+    for (int i = 0; i < graph->V; i++)
+        if (!visited[i] && isCyclicUtil(graph, i, visited, recStack))
+            return true;
+
+    return false;
+}
+
 int main()
 {
     int m;
@@ -79,6 +127,11 @@ int main()
     }
 
     printGraph(graph);
+
+    if (isCyclic(graph))
+        printf("The graph contains a cycle.\n");
+    else
+        printf("The graph does not contain a cycle.\n");
 
     return 0;
 }

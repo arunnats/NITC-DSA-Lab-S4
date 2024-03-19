@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #define MAX_NODES 1000
+#define UNVISITED -1
 
 struct Node
 {
@@ -43,22 +44,85 @@ void addEdge(struct Graph *graph, int source, int destination)
     struct Node *newNode = createNode(destination);
     newNode->next = graph->array[source].head;
     graph->array[source].head = newNode;
+
+    newNode = createNode(source);
+    newNode->next = graph->array[destination].head;
+    graph->array[destination].head = newNode;
 }
 
-void printGraph(struct Graph *graph)
+void DFSUtil(struct Graph *graph, int v, int *visited, int *componentSize)
 {
-    printf("Adjacency List Representation of the Graph:\n");
-    for (int v = 0; v < graph->V; ++v)
+    visited[v] = 1;
+    componentSize[v]++;
+
+    struct Node *temp = graph->array[v].head;
+    while (temp)
     {
-        printf("Node %d -> ", v + 1); // Adjusted to start from 1
-        struct Node *temp = graph->array[v].head;
-        while (temp)
-        {
-            printf("%d ", temp->destination + 1); // Adjusted to start from 1
-            temp = temp->next;
-        }
-        printf("\n");
+        int adj = temp->destination;
+        if (!visited[adj])
+            DFSUtil(graph, adj, visited, componentSize);
+        temp = temp->next;
     }
+}
+
+int noOfConnectedComponents(struct Graph *graph)
+{
+    int *visited = (int *)malloc(graph->V * sizeof(int));
+    int *componentSize = (int *)calloc(graph->V, sizeof(int));
+    int count = 0;
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        visited[i] = 0;
+        componentSize[i] = 0;
+    }
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (!visited[i])
+        {
+            count++;
+            DFSUtil(graph, i, visited, componentSize);
+        }
+    }
+
+    free(visited);
+    free(componentSize);
+
+    return count;
+}
+
+void sizeOfComponents(struct Graph *graph)
+{
+    int *visited = (int *)malloc(graph->V * sizeof(int));
+    int *componentSize = (int *)calloc(graph->V, sizeof(int));
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        visited[i] = 0;
+        componentSize[i] = 0;
+    }
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (!visited[i])
+        {
+            DFSUtil(graph, i, visited, componentSize);
+        }
+    }
+
+    // Print the sizes of connected components in increasing order
+    printf("Sizes of connected components in the graph:\n");
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (componentSize[i] > 0)
+        {
+            printf("Component %d: %d\n", i + 1, componentSize[i]);
+        }
+    }
+
+    free(visited);
+    free(componentSize);
 }
 
 int main()
@@ -67,20 +131,20 @@ int main()
     scanf("%d", &m);
     struct Graph *graph = createGraph(m);
 
-    int label, adj;
     for (int i = 0; i < m; ++i)
     {
-        scanf("%d", &label); // Read the label of the node
-        while (scanf("%d", &adj) == 1)
+        int label, adj;
+        scanf("%d", &label);
+        while (scanf("%d", &adj) == 1 && adj != label)
         {
-            addEdge(graph, label - 1, adj - 1); // Add an edge between label and adj
-            char c = getchar();
-            if (c == '\n')
-                break; // End of line
+            addEdge(graph, label - 1, adj - 1);
         }
     }
 
-    printGraph(graph);
+    int connectedComponents = noOfConnectedComponents(graph);
+    printf("Total number of connected components in the graph: %d\n", connectedComponents);
+
+    sizeOfComponents(graph);
 
     return 0;
 }

@@ -1,64 +1,136 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-#define MAX_NODES 1000
-
-struct Node
+// A structure to represent a node in the adjacency list
+struct node
 {
-    int destination;
-    struct Node *next;
+    int vertex;
+    struct node *next;
 };
 
-struct List
+// A structure to represent the adjacency list
+struct adj_list
 {
-    struct Node *head;
+    struct node *head;
 };
 
-struct Graph
+// A structure to represent the graph
+struct graph
 {
-    int V;
-    struct List *array;
+    int num_vertices;
+    struct adj_list *adj_lists;
+    int *visited;
+    int *parent; // Array to store parent of each vertex during BFS
 };
 
-struct Node *createNode(int destination)
+// Create a new node in the adjacency list
+struct node *new_node(int vertex)
 {
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->destination = destination;
-    newNode->next = NULL;
-    return newNode;
+    struct node *new_node = (struct node *)malloc(sizeof(struct node));
+    new_node->vertex = vertex;
+    new_node->next = NULL;
+    return new_node;
 }
 
-struct Graph *createGraph(int V)
+// Create a graph with n vertices
+struct graph *create_graph(int n)
 {
-    struct Graph *graph = (struct Graph *)malloc(sizeof(struct Graph));
-    graph->V = V;
-    graph->array = (struct List *)malloc(V * sizeof(struct List));
-    for (int i = 0; i < V; ++i)
-        graph->array[i].head = NULL;
+    struct graph *graph = (struct graph *)malloc(sizeof(struct graph));
+    graph->num_vertices = n;
+    graph->adj_lists = (struct adj_list *)malloc(n * sizeof(struct adj_list));
+    graph->visited = (int *)malloc(n * sizeof(int));
+    graph->parent = (int *)malloc(n * sizeof(int));
+
+    int i;
+    for (i = 0; i < n; i++)
+    {
+        graph->adj_lists[i].head = NULL;
+        graph->visited[i] = 0;
+        graph->parent[i] = -1; // Initialize parent of each vertex to -1
+    }
+
     return graph;
 }
 
-void addEdge(struct Graph *graph, int source, int destination)
+// Add an edge to the graph
+void add_edge(struct graph *graph, int src, int dest)
 {
-    struct Node *newNode = createNode(destination);
-    newNode->next = graph->array[source].head;
-    graph->array[source].head = newNode;
+    if (src >= 0 && src < graph->num_vertices && dest >= 0 && dest < graph->num_vertices)
+    {
+        // Add an edge from src to dest
+        struct node *new_node1 = new_node(dest);
+        new_node1->next = graph->adj_lists[src].head;
+        graph->adj_lists[src].head = new_node1;
+
+        // Add an edge from dest to src
+        struct node *new_node2 = new_node(src);
+        new_node2->next = graph->adj_lists[dest].head;
+        graph->adj_lists[dest].head = new_node2;
+    }
+    else
+    {
+        printf("Invalid edge: (%d, %d)\n", src, dest);
+    }
 }
 
-void printGraph(struct Graph *graph)
+// BFS traversal of the graph starting from vertex v
+void bfs(struct graph *graph, int start, int end)
 {
-    printf("Adjacency List Representation of the Graph:\n");
-    for (int v = 0; v < graph->V; ++v)
+    // Create a queue for BFS
+    int queue[1000];
+    int front = -1;
+    int rear = -1;
+
+    // Mark the start node as visited and enqueue it
+    graph->visited[start] = 1;
+    graph->parent[start] = -1; // Parent of start node is -1
+    queue[++rear] = start;
+
+    // Loop to visit all the vertices in the graph
+    while (front != rear)
     {
-        printf("Node %d -> ", v + 1);
-        struct Node *temp = graph->array[v].head;
-        while (temp)
+        // Dequeue a vertex from the queue
+        int current_vertex = queue[++front];
+
+        // Check if the current vertex is the end vertex
+        if (current_vertex == end)
+            break; // Stop BFS if end vertex is reached
+
+        // Get all the neighbors of the dequeued vertex
+        struct node *temp = graph->adj_lists[current_vertex].head;
+        while (temp != NULL)
         {
-            printf("%d ", temp->destination + 1);
+            int adj_vertex = temp->vertex;
+
+            // If the neighbor has not been visited, mark it as visited, set its parent, and enqueue it
+            if (graph->visited[adj_vertex] == 0)
+            {
+                graph->visited[adj_vertex] = 1;
+                graph->parent[adj_vertex] = current_vertex;
+                queue[++rear] = adj_vertex;
+            }
+
             temp = temp->next;
         }
-        printf("\n");
+    }
+
+    // Print the path from start to end in reverse order
+    printf("Path from %d to %d : ", start, end);
+
+    // Use a stack to store the vertices of the path
+    int stack[1000];
+    int top = -1;
+    int current = end;
+    while (current != -1)
+    {
+        stack[++top] = current;
+        current = graph->parent[current];
+    }
+
+    // Pop elements from the stack to print the path in reverse order
+    while (top >= 0)
+    {
+        printf("%d ", stack[top--]);
     }
 }
 
@@ -66,7 +138,7 @@ int main()
 {
     int m;
     scanf("%d", &m);
-    struct Graph *graph = createGraph(m);
+    struct graph *graph = create_graph(m);
 
     int label, adj;
     for (int i = 0; i < m; ++i)
@@ -74,14 +146,17 @@ int main()
         scanf("%d", &label); // Read the label of the node
         while (scanf("%d", &adj) == 1)
         {
-            addEdge(graph, label - 1, adj - 1); // Add an edge between label and adj
+            add_edge(graph, label, adj); // Add an edge between label and adj
             char c = getchar();
             if (c == '\n')
                 break; // End of line
         }
     }
 
-    printGraph(graph);
+    int start, end;
+    scanf("%d %d", &start, &end); // Read start and end vertices
 
-        return 0;
+    bfs(graph, start, end); // Perform BFS from start to end
+
+    return 0;
 }

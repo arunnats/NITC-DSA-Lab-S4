@@ -61,58 +61,120 @@ void printGraph(struct Graph *graph)
     }
 }
 
+void DFSUtil(struct Graph *graph, int v, int *visited, int *componentSize, int componentIndex)
+{
+    visited[v] = 1;
+    componentSize[componentIndex]++;
+
+    struct Node *temp = graph->array[v].head;
+    while (temp)
+    {
+        int adj = temp->destination;
+        if (!visited[adj])
+            DFSUtil(graph, adj, visited, componentSize, componentIndex);
+        temp = temp->next;
+    }
+}
+
+int noOfConnectedComponents(struct Graph *graph)
+{
+    int *visited = (int *)malloc(graph->V * sizeof(int));
+    int *componentSize = (int *)calloc(graph->V, sizeof(int));
+    int count = 0;
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        visited[i] = 0;
+        componentSize[i] = 0;
+    }
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (!visited[i])
+        {
+            count++;
+            DFSUtil(graph, i, visited, componentSize, count - 1);
+        }
+    }
+
+    return count;
+}
+
+void sizeOfComponents(struct Graph *graph)
+{
+    int *visited = (int *)malloc(graph->V * sizeof(int));
+    int *componentSize = (int *)calloc(graph->V, sizeof(int));
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        visited[i] = 0;
+        componentSize[i] = 0;
+    }
+
+    int count = 0;
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (!visited[i])
+        {
+            count++;
+            DFSUtil(graph, i, visited, componentSize, count - 1);
+        }
+    }
+
+    printf("Sizes of connected components in the graph:\n");
+    for (int i = 0; i < count; ++i)
+    {
+        printf("Component %d: %d\n", i + 1, componentSize[i]);
+    }
+}
+
 void tarjanDFS(struct Graph *graph, int u, int parent, int disc[], int low[], int articulation[], int *time)
 {
-    // Initialize discovery time and low value for current node
     disc[u] = low[u] = ++(*time);
-    // Count children of current node in DFS tree
+
     int children = 0;
 
-    // Traverse all adjacent vertices of the current vertex
     struct Node *v = graph->array[u].head;
     while (v != NULL)
     {
         int adj = v->destination;
-        // If adj is not visited yet, process it
+
         if (disc[adj] == -1)
         {
             children++;
-            // Update parent for the adjacent vertex
+
             tarjanDFS(graph, adj, u, disc, low, articulation, time);
-            // Update low value of the current vertex for back edge
+
             low[u] = (low[u] < low[adj]) ? low[u] : low[adj];
-            // Check if the current vertex is an articulation point
+
             if ((parent == -1 && children > 1) || (parent != -1 && low[adj] >= disc[u]))
                 articulation[u] = 1;
         }
-        // If adj is visited and not the parent of current vertex, update low value
+
         else if (adj != parent)
             low[u] = (low[u] < disc[adj]) ? low[u] : disc[adj];
         v = v->next;
     }
 }
 
-void findBridgesAndArticulationPoints(struct Graph *graph)
+int findBridges(struct Graph *graph)
 {
     int disc[MAX_NODES], low[MAX_NODES];
     int articulation[MAX_NODES] = {0};
     int time = 0;
 
-    // Initialize discovery time and low value arrays
     for (int i = 0; i < graph->V; ++i)
     {
         disc[i] = -1;
         low[i] = -1;
     }
 
-    // Perform DFS and identify bridges and articulation points
     for (int i = 0; i < graph->V; ++i)
     {
         if (disc[i] == -1)
             tarjanDFS(graph, i, -1, disc, low, articulation, &time);
     }
 
-    // Count the number of bridges and articulation points
     int bridges = 0, articulationPoints = 0;
     for (int i = 0; i < graph->V; ++i)
     {
@@ -129,8 +191,44 @@ void findBridgesAndArticulationPoints(struct Graph *graph)
         }
     }
 
-    printf("Number of bridges in the graph: %d\n", bridges);
-    printf("Number of articulation points in the graph: %d\n", articulationPoints);
+    return bridges;
+}
+
+int findArticulationPoints(struct Graph *graph)
+{
+    int disc[MAX_NODES], low[MAX_NODES];
+    int articulation[MAX_NODES] = {0};
+    int time = 0;
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        disc[i] = -1;
+        low[i] = -1;
+    }
+
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (disc[i] == -1)
+            tarjanDFS(graph, i, -1, disc, low, articulation, &time);
+    }
+
+    int bridges = 0, articulationPoints = 0;
+    for (int i = 0; i < graph->V; ++i)
+    {
+        if (articulation[i])
+            articulationPoints++;
+
+        struct Node *v = graph->array[i].head;
+        while (v != NULL)
+        {
+            int adj = v->destination;
+            if (low[adj] > disc[i])
+                bridges++;
+            v = v->next;
+        }
+    }
+
+    return articulationPoints;
 }
 
 int main()
@@ -154,7 +252,10 @@ int main()
 
     printGraph(graph);
 
-    findBridgesAndArticulationPoints(graph);
+    int connectedComponents = noOfConnectedComponents(graph);
+    printf("Total number of connected components in the graph: %d\n", connectedComponents);
+
+    sizeOfComponents(graph);
 
     return 0;
 }

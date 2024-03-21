@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define MAX_NODES 1000
 
@@ -82,6 +83,5 @@ int main()
 
     printGraph(graph);
 
-    return 0;
+        return 0;
 }
-en

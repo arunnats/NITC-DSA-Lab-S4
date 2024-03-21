@@ -114,7 +114,6 @@ void bfs(struct graph *graph, int start, int end)
         }
     }
 
-    // Print the path from start to end in reverse order
     printf("Path from %d to %d : ", start, end);
 
     // Use a stack to store the vertices of the path

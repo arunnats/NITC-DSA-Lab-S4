@@ -1,151 +1,141 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-// A structure to represent a node in the adjacency list
 struct node
 {
-    int vertex;
+    int label;
     struct node *next;
 };
 
-// A structure to represent the adjacency list
-struct adj_list
-{
-    struct node *head;
-};
+typedef struct node node;
 
-// A structure to represent the graph
-struct graph
+node *create_node(int label)
 {
-    int num_vertices;
-    struct adj_list *adj_lists;
-};
-
-// Create a new node in the adjacency list
-struct node *new_node(int vertex)
-{
-    struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    new_node->vertex = vertex;
-    new_node->next = NULL;
-    return new_node;
+    node *newnode = (node *)malloc(sizeof(node));
+    newnode->label = label;
+    newnode->next = NULL;
 }
 
-// Create a graph with n vertices
-struct graph *create_graph(int n)
+void print(int *stack, int top)
 {
-    struct graph *graph = (struct graph *)malloc(sizeof(struct graph));
-    graph->num_vertices = n;
-    graph->adj_lists = (struct adj_list *)malloc(n * sizeof(struct adj_list));
-
-    int i;
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < top; i++)
     {
-        graph->adj_lists[i].head = NULL;
-    }
-
-    return graph;
-}
-
-// Add an edge to the graph
-void add_edge(struct graph *graph, int src, int dest)
-{
-    if (src >= 0 && src < graph->num_vertices && dest >= 0 && dest < graph->num_vertices)
-    {
-        // Add an edge from src to dest
-        struct node *new_node1 = new_node(dest);
-        new_node1->next = graph->adj_lists[src].head;
-        graph->adj_lists[src].head = new_node1;
-    }
-    else
-    {
-        printf("Invalid edge: (%d, %d)\n", src, dest);
-    }
-}
-
-// Utility function to print a path
-void print_path(int path[], int path_len)
-{
-    for (int i = 0; i < path_len; i++)
-    {
-        printf("%d ", path[i]);
+        printf("%d ", stack[i]);
     }
     printf("\n");
 }
 
-// Recursive function to print all paths from 'src' to 'dest' in a graph
-void print_all_paths_util(struct graph *graph, int src, int dest, int path[], int path_index, bool visited[])
+void DFS(node **graph, int *visited, int label, int end, int *stack, int top)
 {
-    visited[src] = true;
-    path[path_index] = src;
-    path_index++;
 
-    if (src == dest)
-    {
-        print_path(path, path_index);
-    }
+    visited[label] = 1;
+    stack[top++] = label;
+    node *temp = graph[label]->next;
+
+    if (label == end)
+        print(stack, top);
     else
     {
-        struct node *temp = graph->adj_lists[src].head;
         while (temp != NULL)
         {
-            if (!visited[temp->vertex])
-            {
-                print_all_paths_util(graph, temp->vertex, dest, path, path_index, visited);
-            }
+            if (visited[temp->label] == 0)
+                DFS(graph, visited, temp->label, end, stack, top);
             temp = temp->next;
         }
     }
 
-    path_index--;
-    visited[src] = false;
+    top--;
+    visited[label] = 0;
 }
 
-// Function to print all paths from 'src' to 'dest' in a graph
-void print_all_paths(struct graph *graph, int src, int dest)
+void all_path(node **graph, int start, int end, int n)
 {
-    bool *visited = (bool *)malloc(graph->num_vertices * sizeof(bool));
-    int *path = (int *)malloc(graph->num_vertices * sizeof(int));
-    for (int i = 0; i < graph->num_vertices; i++)
+    int visited[n + 1];
+    int stack[n];
+    int top = 0;
+
+    for (int i = 0; i <= n; i++)
     {
-        visited[i] = false;
+        visited[i] = 0;
     }
-    print_all_paths_util(graph, src, dest, path, 0, visited);
-    free(visited);
-    free(path);
+
+    DFS(graph, visited, start, end, stack, top);
+}
+
+int isolated(node **graph, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (graph[i]->next == NULL)
+            return 0;
+    }
+    return 1;
+}
+
+int DFS_cycle(node **graph, int label, int *visited, int n)
+{
+
+    visited[label] = 1;
+    node *temp = graph[label]->next;
+
+    return 0;
+}
+
+int cycle(node **graph, int n)
+{
+
+    int visited[n + 1];
+
+    for (int i = 0; i <= n; i++)
+    {
+        visited[i] = 0;
+    }
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (visited[i] == 0)
+        {
+            if (DFS_cycle(graph, i, visited, n))
+                return 1;
+        }
+    }
+
+    return 0;
 }
 
 int main()
 {
-    int m;
-    scanf("%d", &m);
-    struct graph *graph = create_graph(m);
+    int n;
+    node **graph;
+    scanf("%d", &n);
 
-    int label, adj;
-    for (int i = 0; i < m; ++i)
+    graph = (node **)malloc((n + 1) * sizeof(node *));
+
+    for (int i = 0; i <= n; i++)
     {
-        scanf("%d", &label); // Read the label of the node
+        node *newnode = create_node(i);
+        graph[i] = newnode;
+    }
+
+    int label;
+    int adj;
+
+    char c;
+    int count = 0;
+    while (scanf("%d", &label) == 1)
+    {
+
+        node *temp = graph[label];
+
         while (scanf("%d", &adj) == 1)
         {
-            add_edge(graph, label, adj); // Add an edge between label and adj
+            node *newnode = create_node(adj);
+            temp->next = newnode;
+            temp = temp->next;
             char c = getchar();
             if (c == '\n')
-                break; // End of line
+                break;
         }
     }
-
-    int start, end;
-    scanf("%d %d", &start, &end); // Read start and end vertices
-
-    if (start >= 0 && start < m && end >= 0 && end < m)
-    {
-        printf("All paths between %d and %d:\n", start, end);
-        print_all_paths(graph, start, end); // Print all paths from start to end
-    }
-    else
-    {
-        printf("-1\n");
-    }
-
-    return 0;
+    all_path(graph, 1, 4, n);
 }

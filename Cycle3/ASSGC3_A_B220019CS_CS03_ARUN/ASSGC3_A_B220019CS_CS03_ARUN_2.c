@@ -1,178 +1,225 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MAX_NODES 1000
+int top = -1;
 
-struct Node
+void print_adj_matrix(int **arr, int rows, int cols)
 {
-    int destination;
-    struct Node *next;
-};
-
-struct List
-{
-    struct Node *head;
-};
-
-struct Graph
-{
-    int V;
-    struct List *array;
-};
-
-struct Node *createNode(int destination)
-{
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->destination = destination;
-    newNode->next = NULL;
-    return newNode;
-}
-
-struct Graph *createGraph(int V)
-{
-    struct Graph *graph = (struct Graph *)malloc(sizeof(struct Graph));
-    graph->V = V;
-    graph->array = (struct List *)malloc(V * sizeof(struct List));
-    for (int i = 0; i < V; ++i)
-        graph->array[i].head = NULL;
-    return graph;
-}
-
-void addEdge(struct Graph *graph, int source, int destination)
-{
-    struct Node *newNode = createNode(destination);
-    newNode->next = graph->array[source].head;
-    graph->array[source].head = newNode;
-}
-
-int BFSForSCC(struct Graph *graph, int start, int *visited)
-{
-    // Queue for BFS traversal
-    int queue[MAX_NODES];
-    int front = 0, rear = 0;
-
-    queue[rear++] = start;
-    visited[start] = 1;
-
-    while (front < rear)
+    for (int i = 0; i < rows; i++)
     {
-        int v = queue[front++];
-        struct Node *temp = graph->array[v].head;
-        while (temp)
+        for (int j = 0; j < cols; j++)
         {
-            if (!visited[temp->destination])
+            printf("%d ", arr[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int stack_not_empty(int stack[])
+{
+    if (top == -1)
+        return 0;
+    else
+        return 1;
+}
+int pop(int stack[])
+{
+    int check = stack_not_empty(stack);
+    if (check == -1)
+    {
+        return -1;
+    }
+    else
+    {
+        int num = stack[top];
+        top--;
+        return num;
+    }
+}
+void push(int stack[], int data)
+{
+    top = top + 1;
+    stack[top] = data;
+    return;
+}
+
+int cycle_check(int **adj_matrix, int visited[], int stack[], int n, int u)
+{
+    visited[u] = 1;
+    push(stack, u);
+    while (stack_not_empty(stack))
+    {
+        u = pop(stack);
+        for (int v = 0; v < n; v++)
+        {
+            if (adj_matrix[u][v] == 1)
             {
-                queue[rear++] = temp->destination;
-                visited[temp->destination] = 1;
+                if (visited[v] != 1)
+                {
+                    visited[v] = 1;
+                    push(stack, v);
+                }
+                else
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (stack[i] == v)
+                            return 0; // cycle found
+                    }
+                    // printf("%d %d",u,v);
+                }
             }
-            temp = temp->next;
         }
     }
-
-    return rear;
+    // push(stack,u);
+    return 1; // no cycle found
 }
 
-int numberOfStronglyConnectedComponents(struct Graph *graph)
+int cyclic(int **adj_matrix, int visited[], int stack[], int n)
 {
-    int visited[MAX_NODES] = {0};
-    int components = 0;
-
-    for (int i = 0; i < graph->V; ++i)
+    int check;
+    for (int u = 0; u < n; u++)
     {
-        if (!visited[i])
+        if (visited[u] != 1)
         {
-            BFSForSCC(graph, i, visited);
-            components++;
+            check = cycle_check(adj_matrix, visited, stack, n, u);
+            if (check == 0) // cycle is found
+            {
+                // printf("%d\n",u);
+                return 0;
+            }
         }
     }
-
-    return components;
+    return 1; // no cycle found
 }
 
-int isCyclicUtil(struct Graph *graph, int v, int *visited, int *recStack)
+void dfs(int **adj_matrix, int n, int u, int visited[], int stack[])
 {
-    if (visited[v] == 0)
-    {
-        visited[v] = 1;
-        recStack[v] = 1;
+    visited[u] = 1; // Mark current vertex as visited
+    // printf("%d ", u); // Print the current vertex
 
-        struct Node *temp = graph->array[v].head;
-        while (temp)
+    // Visit all adjacent vertices of vertex u
+    for (int v = 0; v < n; v++)
+    {
+        if (adj_matrix[u][v] == 1 && !visited[v])
         {
-            int adj = temp->destination;
-            if (visited[adj] == 0 && isCyclicUtil(graph, adj, visited, recStack))
-                return 1;
-            else if (recStack[adj] == 1)
-                return 1;
-            temp = temp->next;
+            dfs(adj_matrix, n, v, visited, stack); // Recursive call to DFS for adjacent unvisited vertex
         }
     }
-
-    recStack[v] = 0;
-    return 0;
+    push(stack, u);
 }
 
-int isCyclic(struct Graph *graph)
+void dfs_without_stack(int **adj_matrix, int n, int u, int visited[])
 {
-    int *visited = (int *)malloc(graph->V * sizeof(int));
-    int *recStack = (int *)malloc(graph->V * sizeof(int));
-    for (int i = 0; i < graph->V; i++)
+    visited[u] = 1; // Mark current vertex as visited
+    // printf("%d ", u); // Print the current vertex
+
+    // Visit all adjacent vertices of vertex u
+    for (int v = 0; v < n; v++)
     {
-        visited[i] = 0;
-        recStack[i] = 0;
+        if (adj_matrix[u][v] == 1 && !visited[v])
+        {
+            dfs_without_stack(adj_matrix, n, v, visited); // Recursive call to DFS for adjacent unvisited vertex
+        }
     }
-
-    for (int i = 0; i < graph->V; i++)
-        if (visited[i] == 0 && isCyclicUtil(graph, i, visited, recStack))
-            return 1;
-
-    return 0;
 }
 
 int main()
 {
-    int N;
-    scanf("%d", &N);
+    int num;
+    scanf("%d", &num);
+    int n = num;
+    int rows = n;
+    int cols = n;
 
-    struct Graph *graph = createGraph(N);
-
-    char adjacencyMatrix[MAX_NODES][MAX_NODES + 1];
-    for (int i = 0; i < N; ++i)
+    int **adj_matrix = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++)
     {
-        scanf("%s", adjacencyMatrix[i]);
+        adj_matrix[i] = (int *)malloc(cols * sizeof(int));
     }
 
-    for (int i = 0; i < N; ++i)
+    for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < N; ++j)
-        {
-            if (adjacencyMatrix[i][j] == '1')
-            {
-                addEdge(graph, i, j);
-            }
-        }
+        for (int j = 0; j < n; j++)
+            scanf("%d", &adj_matrix[i][j]);
     }
 
-    char option;
-    while (scanf(" %c", &option) == 1)
-    {
-        if (option == 't')
-        {
+    getchar();
 
-            if (isCyclic(graph))
+    int visited[n];
+    for (int i = 0; i < n; i++)
+        visited[i] = 0;
+
+    int stack[n];
+
+    char ans;
+
+    /*
+    t - checks if topological sorting is possible i.e checks if the graph is acyclic
+    c - counts the number of strongly connected components
+    x - terminates
+    */
+
+    scanf("%c", &ans);
+
+    while (ans != 'x')
+    {
+        if (ans == 't')
+        {
+            int check;
+            check = cyclic(adj_matrix, visited, stack, n);
+
+            if (check == 1)
+                // printf("no cycle found\n");
                 printf("1\n");
             else
+                // printf("cycle found\n");
                 printf("-1\n");
         }
-        else if (option == 'c')
-        {
-            printf("%d\n", numberOfStronglyConnectedComponents(graph));
-        }
-        else if (option == 'x')
-        {
-            break;
-        }
-    }
 
-    return 1;
+        else if (ans == 'c')
+        {
+            for (int i = 0; i < n; i++)
+                visited[i] = 0;
+
+            top = -1;
+
+            for (int i = 0; i < n; i++)
+            {
+                if (!visited[i])
+                {
+                    dfs(adj_matrix, n, i, visited, stack);
+                }
+            }
+            int **adj_matrix_T = (int **)malloc(cols * sizeof(int *));
+            for (int i = 0; i < cols; i++)
+            {
+                adj_matrix_T[i] = (int *)malloc(rows * sizeof(int));
+            }
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                    adj_matrix_T[i][j] = adj_matrix[j][i];
+            }
+
+            int scc = 0;
+            for (int i = 0; i < n; i++)
+                visited[i] = 0;
+
+            while (stack_not_empty(stack))
+            {
+                int u = pop(stack);
+                if (visited[u] != 1)
+                {
+                    scc++;
+                    dfs_without_stack(adj_matrix_T, n, u, visited);
+                }
+            }
+
+            printf("%d\n", scc);
+        }
+        scanf("%c", &ans);
+    }
+    return 0;
 }

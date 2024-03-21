@@ -121,11 +121,11 @@ void sizeOfComponents(struct Graph *graph)
         }
     }
 
-    printf("Sizes of connected components in the graph:\n");
     for (int i = 0; i < count; ++i)
     {
-        printf("Component %d: %d\n", i + 1, componentSize[i]);
+        printf("%d ", componentSize[i]);
     }
+    printf("\n");
 }
 
 void tarjanDFS(struct Graph *graph, int u, int parent, int disc[], int low[], int articulation[], int *time)
@@ -250,12 +250,42 @@ int main()
         }
     }
 
-    printGraph(graph);
+    char choice;
 
-    int connectedComponents = noOfConnectedComponents(graph);
-    printf("Total number of connected components in the graph: %d\n", connectedComponents);
+    do
+    {
+        scanf(" %c", &choice);
 
-    sizeOfComponents(graph);
+        switch (choice)
+        {
+        case 'n':
 
-    return 0;
+            printf("%d \n", noOfConnectedComponents(graph));
+            break;
+
+        case 's':
+
+            sizeOfComponents(graph);
+            break;
+
+        case 'b':
+
+            printf("%d \n", findBridges(graph));
+            break;
+
+        case 'a':
+
+            printf("%d \n", findArticulationPoints(graph));
+            break;
+
+        case 't':
+            break;
+
+        default:
+            break;
+        }
+
+    } while (choice != 't');
+
+    return 1;
 }

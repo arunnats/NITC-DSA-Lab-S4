@@ -1,30 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct graph_node
+typedef struct Node
 {
     int label;
-    struct adjacency_list *adj_list;
-};
+    struct Node *next;
+} Node;
 
-struct adjacency_list
+typedef struct
 {
-    int vertex;
-    struct adjacency_list *next;
-};
+    Node **graph;
+    int size;
+} Graph;
 
-typedef struct graph_node GraphNode;
-typedef struct adjacency_list AdjacencyList;
-
-GraphNode *create_graph_node(int label)
+Node *createNode(int label)
 {
-    GraphNode *new_node = (GraphNode *)malloc(sizeof(GraphNode));
-    new_node->label = label;
-    new_node->adj_list = NULL;
-    return new_node;
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    if (newNode != NULL)
+    {
+        newNode->label = label;
+        newNode->next = NULL;
+    }
+    return newNode;
 }
 
-void print_stack(int *stack, int top)
+void printStack(int *stack, int top)
 {
     for (int i = 0; i < top; i++)
     {
@@ -33,20 +33,20 @@ void print_stack(int *stack, int top)
     printf("\n");
 }
 
-void DFS(GraphNode **graph, int *visited, int label, int end, int *stack, int top)
+void DFS(Graph *graph, int *visited, int label, int end, int *stack, int top)
 {
     visited[label] = 1;
     stack[top++] = label;
-    AdjacencyList *temp = graph[label]->adj_list;
+    Node *temp = graph->graph[label]->next;
 
     if (label == end)
-        print_stack(stack, top);
+        printStack(stack, top);
     else
     {
         while (temp != NULL)
         {
-            if (visited[temp->vertex] == 0)
-                DFS(graph, visited, temp->vertex, end, stack, top);
+            if (visited[temp->label] == 0)
+                DFS(graph, visited, temp->label, end, stack, top);
             temp = temp->next;
         }
     }
@@ -55,13 +55,13 @@ void DFS(GraphNode **graph, int *visited, int label, int end, int *stack, int to
     visited[label] = 0;
 }
 
-void all_paths(GraphNode **graph, int start, int end, int n)
+void findAllPaths(Graph *graph, int start, int end)
 {
-    int visited[n + 1];
-    int stack[n];
+    int visited[graph->size + 1];
+    int stack[graph->size];
     int top = 0;
 
-    for (int i = 0; i <= n; i++)
+    for (int i = 0; i <= graph->size; i++)
     {
         visited[i] = 0;
     }
@@ -69,100 +69,168 @@ void all_paths(GraphNode **graph, int start, int end, int n)
     DFS(graph, visited, start, end, stack, top);
 }
 
-int is_isolated(GraphNode **graph, int n)
+int isIsolated(Graph *graph)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < graph->size; i++)
     {
-        if (graph[i]->adj_list == NULL)
+        if (graph->graph[i]->next == NULL)
             return 0;
     }
     return 1;
 }
 
-int DFS_cycle(GraphNode **graph, int label, int *visited, int n)
+int DFSForCycle(Graph *graph, int v, int visited[], int parent)
 {
-    visited[label] = 1;
-    AdjacencyList *temp = graph[label]->adj_list;
-    return 0; // You need to implement the cycle detection logic
-}
+    visited[v] = 1;
 
-int has_cycle(GraphNode **graph, int n)
-{
-    int visited[n + 1];
-
-    for (int i = 0; i <= n; i++)
+    Node *temp = graph->graph[v]->next;
+    while (temp != NULL)
     {
-        visited[i] = 0;
-    }
+        int adj_vertex = temp->label;
 
-    for (int i = 1; i <= n; i++)
-    {
-        if (visited[i] == 0)
+        if (!visited[adj_vertex])
         {
-            if (DFS_cycle(graph, i, visited, n))
+            if (DFSForCycle(graph, adj_vertex, visited, v))
                 return 1;
         }
+        else if (adj_vertex != parent)
+            return 1;
+
+        temp = temp->next;
     }
 
     return 0;
 }
 
+int hasCycle(Graph *graph)
+{
+    int *visited = (int *)malloc(graph->size * sizeof(int));
+
+    for (int i = 0; i < graph->size; i++)
+        visited[i] = 0;
+
+    for (int v = 0; v < graph->size; v++)
+    {
+        if (!visited[v])
+        {
+            if (DFSForCycle(graph, v, visited, -1))
+            {
+                free(visited);
+                return 1;
+            }
+        }
+    }
+
+    free(visited);
+    return 0;
+}
+
+void markReachableVertices(Graph *graph, int v, int visited[])
+{
+    visited[v] = 1;
+
+    Node *temp = graph->graph[v]->next;
+    while (temp != NULL)
+    {
+        int adj_vertex = temp->label;
+        if (!visited[adj_vertex])
+            markReachableVertices(graph, adj_vertex, visited);
+        temp = temp->next;
+    }
+}
+
+int isEveryVertexReachable(Graph *graph, int root)
+{
+    int *visited = (int *)malloc(graph->size * sizeof(int));
+
+    for (int i = 0; i < graph->size; i++)
+        visited[i] = 0;
+
+    markReachableVertices(graph, root, visited);
+
+    for (int i = 0; i < graph->size; i++)
+    {
+        if (!visited[i])
+        {
+            free(visited);
+            return 0;
+        }
+    }
+
+    free(visited);
+    return 1;
+}
+
+int hasIsolatedVertices(Graph *graph)
+{
+    for (int i = 0; i < graph->size; i++)
+    {
+        if (graph->graph[i]->next == NULL)
+            return 1;
+    }
+    return 0;
+}
+
+int isValidTree(Graph *graph)
+{
+    if (hasCycle(graph))
+        return -1;
+
+    if (!isEveryVertexReachable(graph, 0))
+        return -1;
+
+    if (hasIsolatedVertices(graph))
+        return -1;
+
+    return 1;
+}
+
 int main()
 {
     int n;
-    GraphNode **graph;
+    Graph graph;
     scanf("%d", &n);
 
-    graph = (GraphNode **)malloc((n + 1) * sizeof(GraphNode *));
+    graph.size = n;
+    graph.graph = (Node **)malloc((n + 1) * sizeof(Node *));
+    if (graph.graph == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        return 1;
+    }
 
     for (int i = 0; i <= n; i++)
     {
-        GraphNode *new_node = create_graph_node(i);
-        graph[i] = new_node;
+        Node *newNode = createNode(i);
+        if (newNode == NULL)
+        {
+            printf("Memory allocation failed.\n");
+            return 1;
+        }
+        graph.graph[i] = newNode;
     }
 
-    int label;
-    int adj;
-
-    char c;
+    int label, adj;
     while (scanf("%d", &label) == 1)
     {
-        AdjacencyList *temp = graph[label]->adj_list;
+        Node *temp = graph.graph[label];
+
         while (scanf("%d", &adj) == 1)
         {
-            AdjacencyList *new_node = (AdjacencyList *)malloc(sizeof(AdjacencyList));
-            new_node->vertex = adj;
-            new_node->next = NULL;
-            if (temp == NULL)
+            Node *newNode = createNode(adj);
+            if (newNode == NULL)
             {
-                graph[label]->adj_list = new_node;
-                temp = new_node;
+                printf("Memory allocation failed.\n");
+                return 1;
             }
-            else
-            {
-                temp->next = new_node;
-                temp = temp->next;
-            }
+            temp->next = newNode;
+            temp = temp->next;
             char c = getchar();
             if (c == '\n')
                 break;
         }
     }
-    all_paths(graph, 1, 4, n);
 
-    // Free memory
-    for (int i = 0; i <= n; i++)
-    {
-        AdjacencyList *temp = graph[i]->adj_list;
-        while (temp != NULL)
-        {
-            AdjacencyList *next = temp->next;
-            free(temp);
-            temp = next;
-        }
-        free(graph[i]);
-    }
-    free(graph);
-
+    findAllPaths(&graph, 1, 4);
     return 0;
 }

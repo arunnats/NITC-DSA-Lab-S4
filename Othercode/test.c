@@ -1,30 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node
+struct node
 {
     int label;
-    struct Node *next;
-} Node;
+    struct node *next;
+};
 
-typedef struct
-{
-    Node **graph;
-    int size;
-} Graph;
+typedef struct node node;
 
-Node *createNode(int label)
+node *create_node(int label)
 {
-    Node *newNode = (Node *)malloc(sizeof(Node));
-    if (newNode != NULL)
-    {
-        newNode->label = label;
-        newNode->next = NULL;
-    }
-    return newNode;
+    node *newnode = (node *)malloc(sizeof(node));
+    newnode->label = label;
+    newnode->next = NULL;
 }
 
-void printStack(int *stack, int top)
+void print(int *stack, int top)
 {
     for (int i = 0; i < top; i++)
     {
@@ -33,14 +25,15 @@ void printStack(int *stack, int top)
     printf("\n");
 }
 
-void DFS(Graph *graph, int *visited, int label, int end, int *stack, int top)
+void DFS(node **graph, int *visited, int label, int end, int *stack, int top)
 {
+
     visited[label] = 1;
     stack[top++] = label;
-    Node *temp = graph->graph[label]->next;
+    node *temp = graph[label]->next;
 
     if (label == end)
-        printStack(stack, top);
+        print(stack, top);
     else
     {
         while (temp != NULL)
@@ -55,13 +48,13 @@ void DFS(Graph *graph, int *visited, int label, int end, int *stack, int top)
     visited[label] = 0;
 }
 
-void findAllPaths(Graph *graph, int start, int end)
+void all_path(node **graph, int start, int end, int n)
 {
-    int visited[graph->size + 1];
-    int stack[graph->size];
+    int visited[n + 1];
+    int stack[n];
     int top = 0;
 
-    for (int i = 0; i <= graph->size; i++)
+    for (int i = 0; i <= n; i++)
     {
         visited[i] = 0;
     }
@@ -69,38 +62,40 @@ void findAllPaths(Graph *graph, int start, int end)
     DFS(graph, visited, start, end, stack, top);
 }
 
-int isIsolated(Graph *graph)
+int isolated(node **graph, int n)
 {
-    for (int i = 0; i < graph->size; i++)
+    for (int i = 0; i < n; i++)
     {
-        if (graph->graph[i]->next == NULL)
+        if (graph[i]->next == NULL)
             return 0;
     }
     return 1;
 }
 
-int DFSForCycle(Graph *graph, int label, int *visited)
+int DFS_cycle(node **graph, int label, int *visited, int n)
 {
-    visited[label] = 1;
-    Node *temp = graph->graph[label]->next;
 
-    return 0; // Needs to be implemented
+    visited[label] = 1;
+    node *temp = graph[label]->next;
+
+    return 0;
 }
 
-int hasCycle(Graph *graph)
+int cycle(node **graph, int n)
 {
-    int visited[graph->size + 1];
 
-    for (int i = 0; i <= graph->size; i++)
+    int visited[n + 1];
+
+    for (int i = 0; i <= n; i++)
     {
         visited[i] = 0;
     }
 
-    for (int i = 1; i <= graph->size; i++)
+    for (int i = 1; i <= n; i++)
     {
         if (visited[i] == 0)
         {
-            if (DFSForCycle(graph, i, visited))
+            if (DFS_cycle(graph, i, visited, n))
                 return 1;
         }
     }
@@ -111,49 +106,36 @@ int hasCycle(Graph *graph)
 int main()
 {
     int n;
-    Graph graph;
+    node **graph;
     scanf("%d", &n);
 
-    graph.size = n;
-    graph.graph = (Node **)malloc((n + 1) * sizeof(Node *));
-    if (graph.graph == NULL)
-    {
-        printf("Memory allocation failed.\n");
-        return 1;
-    }
+    graph = (node **)malloc((n + 1) * sizeof(node *));
 
     for (int i = 0; i <= n; i++)
     {
-        Node *newNode = createNode(i);
-        if (newNode == NULL)
-        {
-            printf("Memory allocation failed.\n");
-            return 1;
-        }
-        graph.graph[i] = newNode;
+        node *newnode = create_node(i);
+        graph[i] = newnode;
     }
 
-    int label, adj;
+    int label;
+    int adj;
+
+    char c;
+    int count = 0;
     while (scanf("%d", &label) == 1)
     {
-        Node *temp = graph.graph[label];
+
+        node *temp = graph[label];
 
         while (scanf("%d", &adj) == 1)
         {
-            Node *newNode = createNode(adj);
-            if (newNode == NULL)
-            {
-                printf("Memory allocation failed.\n");
-                return 1;
-            }
-            temp->next = newNode;
+            node *newnode = create_node(adj);
+            temp->next = newnode;
             temp = temp->next;
             char c = getchar();
             if (c == '\n')
                 break;
         }
     }
-
-    findAllPaths(&graph, 1, 4);
-    return 0;
+    all_path(graph, 1, 4, n);
 }

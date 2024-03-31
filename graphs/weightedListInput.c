@@ -40,11 +40,29 @@ struct Graph *createGraph(int V)
     return graph;
 }
 
+// void addEdge(struct Graph *graph, int source, int destination)
+// {
+//     struct Node *newNode = createNode(destination);
+//     newNode->next = graph->array[source].head;
+//     graph->array[source].head = newNode;
+// }
+
 void addEdge(struct Graph *graph, int source, int destination)
 {
     struct Node *newNode = createNode(destination);
-    newNode->next = graph->array[source].head;
-    graph->array[source].head = newNode;
+    struct Node *temp = graph->array[source].head;
+    if (temp == NULL)
+    {
+        graph->array[source].head = newNode;
+    }
+    else
+    {
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
 }
 
 void addWeight(struct Graph *graph, int source, int weight, int count)

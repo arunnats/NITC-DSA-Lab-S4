@@ -119,7 +119,7 @@ int main()
         }
     }
 
-    printGraph(graph);
+    // printGraph(graph);
 
     for (int i = 0; i < m; ++i)
     {
@@ -131,7 +131,7 @@ int main()
             addWeight(graph, label, weight, count);
             count++;
 
-            printf("weight: %d\n", weight);
+            // printf("weight: %d\n", weight);
             char c = getchar();
             if (c == '\n')
                 break; // End of line

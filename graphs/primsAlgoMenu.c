@@ -63,8 +63,6 @@ int minKey(int key[], int mstSet[], int m)
     return min_index;
 }
 
-// A utility function to print the
-// constructed MST stored in parent[]
 void printMSTWeight(int parent[], struct Graph *graph)
 {
     int weight = 0;
@@ -76,14 +74,24 @@ void printMSTWeight(int parent[], struct Graph *graph)
 void printMSTEdges(int parent[], struct Graph *graph)
 {
     for (int i = 1; i < graph->numVertices; i++)
-        printf("%d %d ", i, parent[i]);
+        printf("%d %d ", parent[i], i);
 }
 
-// Function to construct and print MST for
-// a graph represented using adjacency
-// matrix representation
-void primMST(struct Graph *graph, int ch)
+void primMST(struct Graph *graph, int startNode, int ch)
 {
+    if (graph == NULL)
+    {
+        printf("-1\n");
+        return;
+    }
+
+    // Check if startNode is valid
+    if (startNode < 0 || startNode >= graph->numVertices)
+    {
+        printf("-1\n");
+        return;
+    }
+
     // Array to store constructed MST
     int m = graph->numVertices;
     int parent[m];
@@ -94,8 +102,9 @@ void primMST(struct Graph *graph, int ch)
     for (int i = 0; i < m; i++)
         key[i] = 999, mstSet[i] = 0;
 
-    key[0] = 0;
-    parent[0] = -1;
+    // Set the key of the start node to 0
+    key[startNode] = 0;
+    parent[startNode] = -1;
 
     // The MST will have V vertices
     for (int count = 0; count < m - 1; count++)
@@ -107,10 +116,23 @@ void primMST(struct Graph *graph, int ch)
         for (int v = 0; v < m; v++)
         {
             if (graph->adjMatrix[u][v] && mstSet[v] == 0 && graph->adjMatrix[u][v] < key[v])
-                parent[v] = u, key[v] = graph->adjMatrix[u][v];
+            {
+                parent[v] = u;
+                key[v] = graph->adjMatrix[u][v];
+            }
         }
     }
 
+    // if (startNode != 0)
+    // {
+    //     int temp[m];
+    //     for (int i = 0; i < m; i++)
+    //         temp[i] = parent[i];
+    //     for (int i = 0; i < m; i++)
+    //         parent[i] = temp[(i + startNode) % m];
+    // }
+
+    // Check the value of 'ch' to decide which function to call for printing MST
     if (ch == 0)
         printMSTWeight(parent, graph);
     else if (ch == 1)
@@ -139,9 +161,9 @@ int main()
     {
         scanf(" %c", &choice);
         if (choice == 's')
-            primMST(graph, 1);
+            primMST(graph, 1, 1);
         else if (choice == 't')
-            primMST(graph, 0);
+            primMST(graph, 1, 0);
         else if (choice == 'p')
             printGraph(graph);
         else if (choice == 'e')

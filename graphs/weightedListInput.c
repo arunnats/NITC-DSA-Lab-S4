@@ -107,9 +107,9 @@ int main()
     {
         scanf("%d", &label); // Read the label of the node
         int weight;
+        int count = 0;
         while (scanf("%d", &weight) == 1)
         {
-            int count = 0;
             addWeight(graph, label, weight, count);
             count++;
 

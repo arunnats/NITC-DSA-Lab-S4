@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <stdbool.h>
 
 struct Graph
 {
@@ -53,13 +51,13 @@ void printGraph(struct Graph *graph)
     }
 }
 
-int minKey(int key[], bool mstSet[], int m)
+int minKey(int key[], int mstSet[], int m)
 {
     // Initialize min value
-    int min = INT_MAX, min_index;
+    int min = 9999, min_index;
 
     for (int v = 0; v < m; v++)
-        if (mstSet[v] == false && key[v] < min)
+        if (mstSet[v] == 0 && key[v] < min)
             min = key[v], min_index = v;
 
     return min_index;
@@ -83,11 +81,11 @@ void primMST(struct Graph *graph)
     int m = graph->numVertices;
     int parent[m];
     int key[m];
-    bool mstSet[m];
+    int mstSet[m];
 
     // Initialize all keys as INFINITE
     for (int i = 0; i < m; i++)
-        key[i] = INT_MAX, mstSet[i] = false;
+        key[i] = 999, mstSet[i] = 0;
 
     key[0] = 0;
     parent[0] = -1;
@@ -97,11 +95,11 @@ void primMST(struct Graph *graph)
     {
         int u = minKey(key, mstSet, m); // Pass 'm' as the number of vertices
 
-        mstSet[u] = true;
+        mstSet[u] = 1;
 
         for (int v = 0; v < m; v++)
         {
-            if (graph->adjMatrix[u][v] && mstSet[v] == false && graph->adjMatrix[u][v] < key[v])
+            if (graph->adjMatrix[u][v] && mstSet[v] == 0 && graph->adjMatrix[u][v] < key[v])
                 parent[v] = u, key[v] = graph->adjMatrix[u][v];
         }
     }

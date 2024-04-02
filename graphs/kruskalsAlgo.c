@@ -78,8 +78,34 @@ void addEdge(struct Graph *graph, int source, int destination)
     }
 }
 
+// void createEdge(struct EdgeList *edgeList, int source, int destination, int weight)
+// {
+//     if (edgeList->num_edges < 999)
+//     {
+//         edgeList->edges[edgeList->num_edges].source = source;
+//         edgeList->edges[edgeList->num_edges].destination = destination;
+//         edgeList->edges[edgeList->num_edges].weight = weight;
+//         edgeList->num_edges++;
+//     }
+//     else
+//     {
+//         printf("Edge list is full. Cannot add more edges.\n");
+//     }
+// }
+
 void createEdge(struct EdgeList *edgeList, int source, int destination, int weight)
 {
+    // Check if the edge already exists
+    for (int i = 0; i < edgeList->num_edges; ++i)
+    {
+        if (edgeList->edges[i].source == source && edgeList->edges[i].destination == destination)
+        {
+            printf("Edge already exists: %d -> %d\n", source, destination);
+            return;
+        }
+    }
+
+    // If the edge doesn't exist, add it
     if (edgeList->num_edges < 999)
     {
         edgeList->edges[edgeList->num_edges].source = source;

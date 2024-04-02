@@ -128,10 +128,12 @@ void dijkstra(struct Graph *graph, int V, int src)
 
     // Print the distances from the source vertex (0) to all vertices
     printf("Shortest distances from source vertex %d to all vertices:\n", src);
-    for (int i = 1; i <= V; ++i)
+    int i;
+    for (i = 1; i < V; i++)
     {
-        printf("Vertex %d: %d\n", i, dist[i]);
+        printf("%d ", dist[i]);
     }
+    printf("%d", dist[i]);
 }
 
 void printGraph(struct Graph *graph)
@@ -188,9 +190,18 @@ int main()
         }
     }
 
+    int t;
+    scanf("%d", &t);
+
     printGraph(graph);
 
-    dijkstra(graph, m, 2);
+    if (t < 1 || t > m)
+    {
+        printf("-1\n");
+        return 0;
+    }
+
+    dijkstra(graph, m, t);
 
     return 0;
 }

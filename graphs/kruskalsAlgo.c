@@ -219,10 +219,11 @@ void Union(struct Subset subsets[], int x, int y)
     }
 }
 
-void KruskalMST(struct EdgeList *edgeList, int V)
+int KruskalMST(struct EdgeList *edgeList, int V)
 {
     struct Edge result[V];
     int e = 0;
+    int total_weight = 0; // Variable to store the total weight of the MST
     int i = 0;
 
     // Allocate memory for creating V subsets
@@ -244,21 +245,27 @@ void KruskalMST(struct EdgeList *edgeList, int V)
         int x = find(subsets, next_edge.source);
         int y = find(subsets, next_edge.destination);
 
-        // If including this edge does't cause cycle, include it
+        // If including this edge doesn't cause a cycle, include it
         if (x != y)
         {
             result[e++] = next_edge;
+            total_weight += next_edge.weight; // Update total weight
             Union(subsets, x, y);
         }
     }
 
+    // Print edges in MST
     printf("Edges in MST:\n");
     for (i = 0; i < e; ++i)
     {
         printf("%d - %d : %d\n", result[i].source, result[i].destination, result[i].weight);
     }
 
+    // Free memory allocated for subsets
     free(subsets);
+
+    // Return total weight of the MST
+    return total_weight;
 }
 
 int main()
@@ -314,7 +321,7 @@ int main()
 
     printf("\n");
 
-    KruskalMST(edgeList, m);
+    printf("%d\n", KruskalMST(edgeList, m));
 
     return 0;
 }

@@ -127,6 +127,34 @@ struct EdgeList *createEdgeList(struct Graph *graph)
     return edgeList;
 }
 
+void sortEdgeList(struct EdgeList *edgeList)
+{
+    // Selection sort implementation
+    for (int i = 0; i < edgeList->num_edges - 1; ++i)
+    {
+        int min_index = i;
+        for (int j = i + 1; j < edgeList->num_edges; ++j)
+        {
+            if (edgeList->edges[j].weight < edgeList->edges[min_index].weight)
+            {
+                min_index = j;
+            }
+        }
+        // Swap edges
+        struct Edge temp = edgeList->edges[min_index];
+        edgeList->edges[min_index] = edgeList->edges[i];
+        edgeList->edges[i] = temp;
+    }
+}
+
+void printEdgeList(struct EdgeList *edgeList)
+{
+    for (int i = 0; i < edgeList->num_edges; ++i)
+    {
+        printf("%d %d %d\n", edgeList->edges[i].source, edgeList->edges[i].destination, edgeList->edges[i].weight);
+    }
+}
+
 void addWeight(struct Graph *graph, int source, int weight, int count)
 {
     struct Node *temp = graph->array[source].head;
@@ -201,6 +229,17 @@ int main()
     }
 
     printGraph(graph);
+
+    printf("\n");
+
+    struct EdgeList *edgeList = createEdgeList(graph);
+
+    printEdgeList(edgeList);
+
+    sortEdgeList(edgeList);
+
+    printf("\n");
+    printEdgeList(edgeList);
 
     return 0;
 }

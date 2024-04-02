@@ -65,15 +65,18 @@ int minKey(int key[], int mstSet[], int m)
 void printMSTWeight(int parent[], struct Graph *graph)
 {
     int weight = 0;
-    for (int i = 1; i < graph->numVertices; i++)
+    for (int i = 0; i < graph->numVertices; i++)
         weight = weight + graph->adjMatrix[i][parent[i]];
     printf("%d\n", weight);
 }
 
-void printMSTEdges(int parent[], struct Graph *graph)
+void printMSTEdges(int parent[], struct Graph *graph, int startNode)
 {
     for (int i = 1; i < graph->numVertices; i++)
+    {
         printf("%d %d ", parent[i], i);
+    }
+    printf("\n");
 }
 
 void primMST(struct Graph *graph, int startNode, int ch)
@@ -84,14 +87,12 @@ void primMST(struct Graph *graph, int startNode, int ch)
         return;
     }
 
-    // Check if startNode is valid
     if (startNode < 0 || startNode >= graph->numVertices)
     {
         printf("-1\n");
         return;
     }
 
-    // Array to store constructed MST
     int m = graph->numVertices;
     int parent[m];
     int key[m];
@@ -101,14 +102,12 @@ void primMST(struct Graph *graph, int startNode, int ch)
     for (int i = 0; i < m; i++)
         key[i] = 9999, mstSet[i] = 0;
 
-    // Set the key of the start node to 0
     key[startNode] = 0;
     parent[startNode] = -1;
 
-    // The MST will have V vertices
     for (int count = 0; count < m - 1; count++)
     {
-        int u = minKey(key, mstSet, m); // Pass 'm' as the number of vertices
+        int u = minKey(key, mstSet, m);
 
         mstSet[u] = 1;
 
@@ -122,20 +121,19 @@ void primMST(struct Graph *graph, int startNode, int ch)
         }
     }
 
-    // if (startNode != 0)
-    // {
-    //     int temp[m];
-    //     for (int i = 0; i < m; i++)
-    //         temp[i] = parent[i];
-    //     for (int i = 0; i < m; i++)
-    //         parent[i] = temp[(i + startNode) % m];
-    // }
-
-    // Check the value of 'ch' to decide which function to call for printing MST
     if (ch == 0)
         printMSTWeight(parent, graph);
-    else if (ch == 1)
-        printMSTEdges(parent, graph);
+    // else if (ch == 1)
+    //     printMSTEdges(parent, graph, startNode);
+    if (ch == 1)
+    {
+        for (int i = 0; i < m; i++)
+        {
+            if (parent[i] != -1)
+                printf("%d %d ", parent[i], i);
+        }
+        printf("\n");
+    }
 }
 
 int main()
@@ -155,14 +153,17 @@ int main()
         }
     }
 
+    int t;
+    scanf("%d", &t);
+
     char choice;
     while (1)
     {
         scanf(" %c", &choice);
         if (choice == 's')
-            primMST(graph, 0, 1);
+            primMST(graph, t, 1);
         else if (choice == 't')
-            primMST(graph, 0, 0);
+            primMST(graph, t, 0);
         else if (choice == 'p')
             printGraph(graph);
         else if (choice == 'e')

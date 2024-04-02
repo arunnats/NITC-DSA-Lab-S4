@@ -34,6 +34,12 @@ struct EdgeList
     int num_edges;
 };
 
+struct Subset
+{
+    int parent;
+    int rank;
+};
+
 struct Node *createNode(int destination)
 {
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
@@ -78,34 +84,8 @@ void addEdge(struct Graph *graph, int source, int destination)
     }
 }
 
-// void createEdge(struct EdgeList *edgeList, int source, int destination, int weight)
-// {
-//     if (edgeList->num_edges < 999)
-//     {
-//         edgeList->edges[edgeList->num_edges].source = source;
-//         edgeList->edges[edgeList->num_edges].destination = destination;
-//         edgeList->edges[edgeList->num_edges].weight = weight;
-//         edgeList->num_edges++;
-//     }
-//     else
-//     {
-//         printf("Edge list is full. Cannot add more edges.\n");
-//     }
-// }
-
 void createEdge(struct EdgeList *edgeList, int source, int destination, int weight)
 {
-    // Check if the edge already exists
-    for (int i = 0; i < edgeList->num_edges; ++i)
-    {
-        if (edgeList->edges[i].source == source && edgeList->edges[i].destination == destination)
-        {
-            printf("Edge already exists: %d -> %d\n", source, destination);
-            return;
-        }
-    }
-
-    // If the edge doesn't exist, add it
     if (edgeList->num_edges < 999)
     {
         edgeList->edges[edgeList->num_edges].source = source;
@@ -216,6 +196,71 @@ void printGraph(struct Graph *graph)
     }
 }
 
+int find(struct Subset subsets[], int i)
+{
+    if (subsets[i].parent != i)
+        subsets[i].parent = find(subsets, subsets[i].parent);
+    return subsets[i].parent;
+}
+
+void Union(struct Subset subsets[], int x, int y)
+{
+    int xroot = find(subsets, x);
+    int yroot = find(subsets, y);
+
+    if (subsets[xroot].rank < subsets[yroot].rank)
+        subsets[xroot].parent = yroot;
+    else if (subsets[xroot].rank > subsets[yroot].rank)
+        subsets[yroot].parent = xroot;
+    else
+    {
+        subsets[yroot].parent = xroot;
+        subsets[xroot].rank++;
+    }
+}
+
+void KruskalMST(struct EdgeList *edgeList, int V)
+{
+    struct Edge result[V];
+    int e = 0;
+    int i = 0;
+
+    // Allocate memory for creating V subsets
+    struct Subset *subsets = (struct Subset *)malloc(V * sizeof(struct Subset));
+
+    // Initialize subsets for each vertex
+    for (int v = 0; v < V; ++v)
+    {
+        subsets[v].parent = v;
+        subsets[v].rank = 0;
+    }
+
+    // Number of edges to be taken is V-1
+    while (e < V - 1 && i < edgeList->num_edges)
+    {
+        // Pick the smallest edge
+        struct Edge next_edge = edgeList->edges[i++];
+
+        int x = find(subsets, next_edge.source);
+        int y = find(subsets, next_edge.destination);
+
+        // If including this edge does't cause cycle, include it
+        if (x != y)
+        {
+            result[e++] = next_edge;
+            Union(subsets, x, y);
+        }
+    }
+
+    printf("Edges in MST:\n");
+    for (i = 0; i < e; ++i)
+    {
+        printf("%d - %d : %d\n", result[i].source, result[i].destination, result[i].weight);
+    }
+
+    free(subsets);
+}
+
 int main()
 {
     int m;
@@ -266,6 +311,10 @@ int main()
 
     printf("\n");
     printEdgeList(edgeList);
+
+    printf("\n");
+
+    KruskalMST(edgeList, m);
 
     return 0;
 }

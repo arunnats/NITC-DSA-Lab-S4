@@ -53,8 +53,7 @@ void printGraph(struct Graph *graph)
 
 int minKey(int key[], int mstSet[], int m)
 {
-    // Initialize min value
-    int min = 9999, min_index;
+    int min = 9999, min_index = -1;
 
     for (int v = 0; v < m; v++)
         if (mstSet[v] == 0 && key[v] < min)
@@ -100,7 +99,7 @@ void primMST(struct Graph *graph, int startNode, int ch)
 
     // Initialize all keys as INFINITE
     for (int i = 0; i < m; i++)
-        key[i] = 999, mstSet[i] = 0;
+        key[i] = 9999, mstSet[i] = 0;
 
     // Set the key of the start node to 0
     key[startNode] = 0;
@@ -161,9 +160,9 @@ int main()
     {
         scanf(" %c", &choice);
         if (choice == 's')
-            primMST(graph, 1, 1);
+            primMST(graph, 0, 1);
         else if (choice == 't')
-            primMST(graph, 1, 0);
+            primMST(graph, 0, 0);
         else if (choice == 'p')
             printGraph(graph);
         else if (choice == 'e')

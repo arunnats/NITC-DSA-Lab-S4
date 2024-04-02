@@ -62,6 +62,44 @@ void swap(struct HeapNode **a, struct HeapNode **b)
     *b = temp;
 }
 
+void decreaseKey(struct PriorityQueue *pQueue, int vertex, int newWeight)
+{
+    for (int i = 0; i < pQueue->size; i++)
+    {
+        if (pQueue->heapNodes[i]->vertex == vertex)
+        {
+            pQueue->heapNodes[i]->weight = newWeight;
+            // Heapify up from the current index to maintain heap property
+            int current = i;
+            while (current > 0 && pQueue->heapNodes[(current - 1) / 2]->weight > pQueue->heapNodes[current]->weight)
+            {
+                swap(&pQueue->heapNodes[current], &pQueue->heapNodes[(current - 1) / 2]);
+                current = (current - 1) / 2;
+            }
+            break;
+        }
+    }
+}
+
+void insertPriorityQueue(struct PriorityQueue *pQueue, struct HeapNode *node)
+{
+    if (pQueue->size == pQueue->capacity)
+    {
+        printf("Priority Queue is full\n");
+        return;
+    }
+
+    pQueue->heapNodes[pQueue->size] = node;
+
+    int current = pQueue->size;
+    while (current > 0 && pQueue->heapNodes[(current - 1) / 2]->weight > pQueue->heapNodes[current]->weight)
+    {
+        swap(&pQueue->heapNodes[current], &pQueue->heapNodes[(current - 1) / 2]);
+        current = (current - 1) / 2;
+    }
+    pQueue->size++;
+}
+
 void heapify(struct HeapNode **queue, int size, int i)
 {
     int smallest = i;
@@ -107,7 +145,7 @@ void primsMST(struct Graph *graph, int startVertex)
     int *key = (int *)malloc(numVertices * sizeof(int));
     int *inMST = (int *)malloc(numVertices * sizeof(int));
 
-    struct PriorityQueue *pQueue = createPriorityQueue(numVertices);
+    struct PriorityQueue *pQueue = createPriorityQueue(numVertices * 2); // Increased capacity to handle duplicates
 
     for (int v = 0; v < numVertices; ++v)
     {
@@ -117,13 +155,16 @@ void primsMST(struct Graph *graph, int startVertex)
     }
 
     key[startVertex] = 0;
-    struct HeapNode *startNode = createHeapNode(startVertex, key[startVertex]);
-    pQueue->heapNodes[pQueue->size++] = startNode;
+    insertPriorityQueue(pQueue, createHeapNode(startVertex, 0));
 
     while (pQueue->size > 0)
     {
         struct HeapNode *minNode = extractMin(pQueue);
         int u = minNode->vertex;
+
+        if (inMST[u])
+            continue;
+
         inMST[u] = 1;
 
         for (int v = 0; v < numVertices; ++v)
@@ -132,17 +173,24 @@ void primsMST(struct Graph *graph, int startVertex)
             {
                 key[v] = graph->adjMatrix[u][v];
                 parent[v] = u;
-                struct HeapNode *newNode = createHeapNode(v, key[v]);
-                pQueue->heapNodes[pQueue->size++] = newNode;
+                if (key[v] == graph->adjMatrix[u][v])
+                {
+                    insertPriorityQueue(pQueue, createHeapNode(v, key[v]));
+                }
+                else
+                {
+                    decreaseKey(pQueue, v, key[v]);
+                }
             }
         }
     }
 
-    // Print the MST edges
+    // Printing the MST
     printf("Minimum Spanning Tree:\n");
-    for (int i = 0; i < numVertices; ++i)
+    for (int i = 1; i < numVertices; ++i) // Start from 1 to avoid printing parent of the start vertex
     {
-        printf("Edge: %d - %d, Weight: %d\n", parent[i], i, graph->adjMatrix[i][parent[i]]);
+        if (parent[i] != -1) // Check if there is a parent
+            printf("Edge: %d - %d, Weight: %d\n", parent[i], i, graph->adjMatrix[i][parent[i]]);
     }
 
     free(parent);

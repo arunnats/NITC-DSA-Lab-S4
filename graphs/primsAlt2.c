@@ -1,19 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node
+struct Node
 {
     int weight;
     int vertex;
     int parent;
-    struct node *next;
+    struct Node *next;
 };
 
-typedef struct node node;
-
-node *create_node(int weight, int vertex, int parent)
+struct Graph
 {
-    node *newnode = (node *)malloc(sizeof(node));
+    int numVertices;
+    int **adjMatrix;
+};
+
+struct Graph *createGraph(int numVertices)
+{
+    struct Graph *graph = (struct Graph *)malloc(sizeof(struct Graph));
+    graph->numVertices = numVertices;
+
+    graph->adjMatrix = (int **)malloc(numVertices * sizeof(int *));
+    for (int i = 0; i < numVertices; ++i)
+    {
+        graph->adjMatrix[i] = (int *)malloc(numVertices * sizeof(int));
+        for (int j = 0; j < numVertices; ++j)
+        {
+            graph->adjMatrix[i][j] = 0;
+        }
+    }
+
+    return graph;
+}
+
+void addEdge(struct Graph *graph, int src, int dest, int weight)
+{
+    graph->adjMatrix[src][dest] = weight;
+}
+
+struct Node *createNode(int weight, int vertex, int parent)
+{
+    struct Node *newnode = (struct Node *)malloc(sizeof(struct Node));
+
     newnode->weight = weight;
     newnode->vertex = vertex;
     newnode->parent = parent;
@@ -22,10 +50,10 @@ node *create_node(int weight, int vertex, int parent)
     return newnode;
 }
 
-node *insert(node *head, int weight, int vertex, int parent)
+struct Node *insert(struct Node *head, int weight, int vertex, int parent)
 {
 
-    node *newnode = create_node(weight, vertex, parent);
+    struct Node *newnode = createNode(weight, vertex, parent);
 
     if (head == NULL)
     {
@@ -33,7 +61,7 @@ node *insert(node *head, int weight, int vertex, int parent)
         return head;
     }
 
-    node *temp = head;
+    struct Node *temp = head;
     if (temp->weight > weight)
     {
         head = newnode;
@@ -58,7 +86,7 @@ node *insert(node *head, int weight, int vertex, int parent)
     return head;
 }
 
-int primsAlgo(int graph[][100], node *head, int start_vertex, int n, int ch)
+int primsAlgo(struct Graph *graph, struct Node *head, int start_vertex, int n, int ch)
 {
 
     int visited[n];
@@ -68,11 +96,11 @@ int primsAlgo(int graph[][100], node *head, int start_vertex, int n, int ch)
         visited[i] = 0;
 
     if (head == NULL)
-        head = create_node(0, start_vertex, -1);
+        head = createNode(0, start_vertex, -1);
 
     while (head != NULL)
     {
-        node *temp = head;
+        struct Node *temp = head;
         head = head->next;
         int current = temp->vertex;
 
@@ -87,9 +115,9 @@ int primsAlgo(int graph[][100], node *head, int start_vertex, int n, int ch)
             }
             for (int i = 0; i < n; i++)
             {
-                if (graph[current][i] != 0)
+                if (graph->adjMatrix[current][i] != 0)
                 {
-                    head = insert(head, graph[current][i], i, current);
+                    head = insert(head, graph->adjMatrix[current][i], i, current);
                 }
             }
         }
@@ -102,29 +130,28 @@ int primsAlgo(int graph[][100], node *head, int start_vertex, int n, int ch)
 
 int main()
 {
-    int n;
-    scanf("%d", &n);
 
-    node *head = NULL;
+    struct Node *head = NULL;
 
-    int label = 0;
-    int graph[n][100];
+    int m;
+    scanf("%d", &m);
+    struct Graph *graph = createGraph(m);
+
+    for (int i = 0; i < m; ++i)
+    {
+        for (int j = 0; j < m; ++j)
+        {
+            int weight;
+            scanf("%d", &weight);
+            if (weight)
+                addEdge(graph, i, j, weight);
+        }
+    }
+
     int weight;
     int i = 0;
     char c;
     char ch[100];
-
-    while (label < n)
-    {
-        scanf("%d", &weight);
-        graph[label][i++] = weight;
-        c = getchar();
-        if (c == '\n')
-        {
-            i = 0;
-            label++;
-        }
-    }
 
     while (1)
     {
@@ -133,7 +160,7 @@ int main()
         {
         case 't':
         {
-            printf("%d\n", primsAlgo(graph, head, 0, n, 0));
+            printf("%d\n", primsAlgo(graph, head, 0, graph->numVertices, 0));
             break;
         }
 
@@ -149,13 +176,13 @@ int main()
                 }
             }
 
-            if (startVertex >= n || startVertex < 0)
+            if (startVertex >= graph->numVertices || startVertex < 0)
             {
                 printf("-1\n");
                 break;
             }
 
-            primsAlgo(graph, head, startVertex, n, 1);
+            primsAlgo(graph, head, startVertex, graph->numVertices, 1);
             printf("\n");
             break;
         }

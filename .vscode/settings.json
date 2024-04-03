@@ -4,6 +4,7 @@
         "typeinfo": "c",
         "avltree2_orderedmap": "c",
         "rbtree1_insert": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "functional": "c"
     }
 }

@@ -106,15 +106,17 @@ struct Node *insertAVL(struct Node *root, int key, int *leftRot, int *rightRot)
 
     if (balance > 1 && key > root->l->key)
     {
-        root->l = leftRotate(root->l);
         (*leftRot)++;
+        (*rightRot)++;
+        root->l = leftRotate(root->l);
         return rightRotate(root);
     }
 
     if (balance < -1 && key < root->r->key)
     {
-        root->r = rightRotate(root->r);
         (*rightRot)++;
+        (*leftRot)++;
+        root->r = rightRotate(root->r);
         return leftRotate(root);
     }
 

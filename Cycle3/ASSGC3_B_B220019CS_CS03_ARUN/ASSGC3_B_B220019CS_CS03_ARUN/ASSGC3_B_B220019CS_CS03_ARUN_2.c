@@ -240,7 +240,6 @@ int main()
 {
     int m;
     scanf("%d", &m);
-
     struct Graph *graph = createGraph(m);
 
     int label, adj;
@@ -252,7 +251,7 @@ int main()
             addEdge(graph, label, adj);
             char c = getchar();
             if (c == '\n')
-                break; // End of line
+                break;
         }
     }
 

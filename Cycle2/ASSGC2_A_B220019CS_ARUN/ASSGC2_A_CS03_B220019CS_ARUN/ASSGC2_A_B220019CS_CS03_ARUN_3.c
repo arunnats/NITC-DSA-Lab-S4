@@ -149,14 +149,14 @@ void printParenthesisRep(struct Node *node)
 {
     if (node == NULL)
     {
-        printf("( ) ");
+        printf("()");
         return;
     }
 
-    printf("(%d %c ", node->key, (node->colour == 0) ? 'R' : 'B');
+    printf("(%d%c", node->key, (node->colour == 0) ? 'R' : 'B');
     printParenthesisRep(node->left);
     printParenthesisRep(node->right);
-    printf(") ");
+    printf(")");
 }
 
 int main()

@@ -172,6 +172,118 @@ struct AdjacencyMatrix initializeAdjMatrix(int rows, int cols)
     return adjMatrix;
 }
 
+int has_cycle_util(struct AdjacencyMatrix adjMatrix, int v, int visited[], int parent)
+{
+    visited[v] = 1;
+
+    for (int adj_vertex = 0; adj_vertex < adjMatrix.rows; adj_vertex++)
+    {
+        if (adjMatrix.matrix[v][adj_vertex])
+        {
+            if (!visited[adj_vertex])
+            {
+                if (has_cycle_util(adjMatrix, adj_vertex, visited, v))
+                    return 1;
+            }
+            else if (adj_vertex != parent)
+            {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
+int has_cycle(struct AdjacencyMatrix adjMatrix)
+{
+    int *visited = (int *)malloc(adjMatrix.rows * sizeof(int));
+
+    for (int i = 0; i < adjMatrix.rows; i++)
+        visited[i] = 0;
+
+    for (int v = 0; v < adjMatrix.rows; v++)
+    {
+        if (!visited[v])
+        {
+            if (has_cycle_util(adjMatrix, v, visited, -1))
+            {
+                free(visited);
+                return 1;
+            }
+        }
+    }
+
+    free(visited);
+    return 0;
+}
+
+void mark_reachable_vertices(struct AdjacencyMatrix adjMatrix, int v, int visited[])
+{
+    visited[v] = 1;
+
+    for (int adj_vertex = 0; adj_vertex < adjMatrix.rows; adj_vertex++)
+    {
+        if (adjMatrix.matrix[v][adj_vertex] && !visited[adj_vertex])
+            mark_reachable_vertices(adjMatrix, adj_vertex, visited);
+    }
+}
+
+int is_every_vertex_reachable(struct AdjacencyMatrix adjMatrix, int root)
+{
+    int *visited = (int *)malloc(adjMatrix.rows * sizeof(int));
+
+    for (int i = 0; i < adjMatrix.rows; i++)
+        visited[i] = 0;
+
+    mark_reachable_vertices(adjMatrix, root, visited);
+
+    for (int i = 0; i < adjMatrix.rows; i++)
+    {
+        if (!visited[i])
+        {
+            free(visited);
+            return 0;
+        }
+    }
+
+    free(visited);
+    return 1;
+}
+
+int has_isolated_vertices(struct AdjacencyMatrix adjMatrix)
+{
+    for (int i = 0; i < adjMatrix.rows; i++)
+    {
+        int isolated = 1;
+        for (int j = 0; j < adjMatrix.cols; j++)
+        {
+            if (adjMatrix.matrix[i][j])
+            {
+                isolated = 0;
+                break;
+            }
+        }
+        if (isolated)
+            return 1;
+    }
+    return 0;
+}
+
+int valid_tree(struct AdjacencyMatrix adjMatrix)
+{
+    if (has_cycle(adjMatrix))
+        return -1;
+
+    if (!is_every_vertex_reachable(adjMatrix, 0))
+        return -1;
+
+    if (has_isolated_vertices(adjMatrix))
+        return -1;
+
+    return 1;
+}
+
 int main()
 {
     int num;
@@ -231,22 +343,8 @@ int main()
         }
         else if (ans == 't')
         {
-            int flagUndirected;
-            flagUndirected = isUndirected(adjMatrix);
-
-            for (int i = 0; i < n; i++)
-                visited[i] = 0;
-            top = -1;
-            int flagAcyclic;
-            flagAcyclic = isAcyclic(adjMatrix, visited, stack);
-            for (int i = 0; i < n; i++)
-                visited[i] = 0;
-            top = -1;
-            dfs(adjMatrix, 0, visited, stack);
-            int flagConnected;
-            flagConnected = isConnected(visited, n);
-
-            if (flagAcyclic && flagConnected && flagUndirected)
+            int result = valid_tree(adjMatrix);
+            if (result == 1)
                 printf("1\n");
             else
                 printf("-1\n");

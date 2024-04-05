@@ -190,7 +190,8 @@ int findBridges(struct Graph *graph)
             v = v->next;
         }
     }
-
+    if(bridges == 0)
+      bridges = -1;
     return bridges;
 }
 
@@ -227,7 +228,8 @@ int findArticulationPoints(struct Graph *graph)
             v = v->next;
         }
     }
-
+    if(articulationPoints == 0)
+      articulationPoints = -1;
     return articulationPoints;
 }
 

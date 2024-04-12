@@ -6,6 +6,7 @@
         "rbtree1_insert": "c",
         "stdio.h": "c",
         "functional": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "string.h": "c"
     }
 }

@@ -1,78 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_NODES 100
-
-int min(int a, int b)
-{
-    return a < b ? a : b;
-}
-
-void DFS(int u, int parent, int graph[][100], int discovery[], int low[], int visited[], int m, int *time, int *bridges, int *articulation_points)
-{
-    visited[u] = 1;
-    discovery[u] = low[u] = ++(*time);
-
-    for (int v = 0; v < m; ++v)
-    {
-        if (graph[u][v])
-        {
-            if (!visited[v])
-            {
-                DFS(v, u, graph, discovery, low, visited, m, time, bridges, articulation_points);
-                low[u] = min(low[u], low[v]);
-
-                // Check if edge (u, v) is a bridge
-                if (low[v] > discovery[u])
-                {
-                    (*bridges)++;
-                }
-
-                // Check if u is an articulation point
-                if (low[v] >= discovery[u] && parent != -1)
-                {
-                    (*articulation_points)++;
-                }
-            }
-            else if (v != parent)
-            {
-                low[u] = min(low[u], discovery[v]);
-            }
-        }
-    }
-}
-
-void Tarjan(int graph[][100], int m)
-{
-    int discovery[MAX_NODES] = {0};
-    int low[MAX_NODES] = {0};
-    int visited[MAX_NODES] = {0};
-    int time = 0;
-    int bridges = 0;
-    int articulation_points = 0;
-
-    for (int i = 0; i < m; ++i)
-    {
-        if (!visited[i])
-        {
-            DFS(i, -1, graph, discovery, low, visited, m, &time, &bridges, &articulation_points);
-        }
-    }
-
-    printf("Number of bridges: %d\n", bridges);
-    printf("Number of articulation points: %d\n", articulation_points);
-}
-
 void printGraph(int graph[][100], int m)
 {
     printf("Adjacency matrix \n");
 
     for (int i = 0; i < m; ++i)
     {
+
         for (int j = 0; j < m; ++j)
         {
+
             printf("%d ", graph[i][j]);
         }
+
         printf("\n");
     }
 }
@@ -82,7 +23,7 @@ int main()
     int m;
     scanf("%d", &m);
 
-    int graph[MAX_NODES][100];
+    int graph[m][100];
 
     int label, adj;
 
@@ -106,10 +47,22 @@ int main()
         }
     }
 
-    printGraph(graph, m);
+    for (int i = 0; i < m; ++i)
+    {
+        scanf("%d", &label);
+        int weight;
+        int count = 0;
+        while (scanf("%d", &weight) == 1)
+        {
+            graph[label][count] = weight;
+            count++;
+            char c = getchar();
+            if (c == '\n')
+                break;
+        }
+    }
 
-    // Call Tarjan's algorithm
-    Tarjan(graph, m);
+    printGraph(graph, m);
 
     return 0;
 }

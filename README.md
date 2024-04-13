@@ -35,3 +35,14 @@ This repository contains implementations of various data structures and algorith
         HashMaps
         Fibonnacci Heaps
         +Many More
+
+## Resources used
+
+### CLRS
+http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/toc.htm
+https://dl.ebooksworld.ir/books/Introduction.to.Algorithms.4th.Leiserson.Stein.Rivest.Cormen.MIT.Press.9780262046305.EBooksWorld.ir.pdf
+
+### NITC Athena Resources
+https://athena.nitc.ac.in/summerschool/Files/
+https://athena.nitc.ac.in/summerschool/Files/clrs.pdf
+ 

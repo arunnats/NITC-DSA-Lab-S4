@@ -1,8 +1,6 @@
 
 # NITC Data Structures and Algorithms Lab (S4) Assignments Repository
 
-A brief description of what this project does and who it's for
-
 ## Overview
 
 This repository contains implementations of various data structures and algorithms in C, created as assignments for my DSA Lab at NITC (Semester 4) course. Throughout the course, I've implemented multiple algorithms and data structures to solve various problems efficiently.
